@@ -1,0 +1,47 @@
+name: goodquestion_admin
+description: "굿퀘스천 관리자 콘솔. 웹 전용."
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  # 서비스 프론트엔드와 같은 Flutter 3.44.9 (Dart 3.12.2) 를 씁니다.
+  sdk: ^3.12.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
+
+  # 상태관리 — ViewModel(ChangeNotifier) 을 위젯 트리에 붙입니다
+  provider: ^6.1.2
+
+  # DI — Repository / UseCase / DataSource 등 위젯과 무관한 객체
+  get_it: ^8.0.3
+
+  # 라우팅 — 경로를 lib/core/router/ 한 곳에 선언합니다
+  go_router: ^17.4.0
+
+  # HTTP — 인터셉터로 토큰·에러·로깅을 한 곳에서 처리
+  dio: ^5.7.0
+
+  # 관리자 토큰 저장. 웹에서는 브라우저 저장소를 씁니다
+  flutter_secure_storage: ^10.0.0
+
+  # 날짜·숫자 표기. 관리자 화면은 표가 많아 자릿수 구분과 상대 시간이 자주 필요합니다
+  intl: ^0.20.2
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # 테스트용 mock (코드 생성 불필요)
+  mocktail: ^1.0.4
+
+  # 린트 규칙. analysis_options.yaml 에서 확장합니다
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
