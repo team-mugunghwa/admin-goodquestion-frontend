@@ -49,6 +49,11 @@ linter:
     unawaited_futures: true
 
     # --- 팀 규칙 ---
+    # 생성자에서 private 필드를 이름 있는 매개변수로 받습니다. 이름 있는 매개변수는
+    # 밑줄로 시작할 수 없어(Dart 문법) 초기화 형식 매개변수를 쓸 수 없는데, 이 규칙은
+    # 그 경우를 구분하지 못하고 매번 걸립니다. ViewModel 이 UseCase 를 서너 개씩
+    # 받는 구조라 해당 자리가 많아 규칙 자체를 끕니다.
+    prefer_initializing_formals: false
     # 공개 API 에 타입을 명시해 리뷰어가 추론하지 않아도 되게 합니다
     type_annotate_public_apis: true
     # 위젯 생성자에 key 를 빠뜨리지 않기
