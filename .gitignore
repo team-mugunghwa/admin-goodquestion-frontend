@@ -1,0 +1,125 @@
+# ─────────────────────────────────────────────────────────────
+# GoodQuestion — Flutter 앱용 .gitignore
+#
+# ⚠️ 커밋해야 하는 것 (일부러 여기 넣지 않았습니다):
+#   pubspec.lock   → 팀 전원과 CI가 같은 패키지 버전을 써야 함 (docs/DECISIONS.md 007)
+#   *.g.dart       → 클론 직후 build_runner 없이 바로 실행되게 (DECISIONS.md 005)
+#   .metadata      → Flutter가 프로젝트 정보를 읽는 파일
+#   android/gradlew, gradle-wrapper.jar → 없으면 CI 빌드가 깨짐
+# ─────────────────────────────────────────────────────────────
+
+# ── Dart / Flutter ──────────────────────────────────────────
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-versions
+**/doc/api/
+coverage/
+*.dart.js
+*.info.json
+*.js_
+*.js.deps
+*.js.map
+
+# 실행/디버그 부산물
+*.log
+.fvm/flutter_sdk
+
+# ── 환경변수 · 비밀값 (절대 커밋 금지) ──────────────────────
+.env
+.env.*
+!.env.example
+env.json
+!env.example.json
+secrets.json
+*.pem
+
+# ── Android ─────────────────────────────────────────────────
+**/android/**/gradle-wrapper.jar
+**/android/.gradle
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+**/android/key.properties
+**/android/app/debug
+**/android/app/profile
+**/android/app/release
+*.jks
+*.keystore
+
+# ── iOS ─────────────────────────────────────────────────────
+**/ios/**/*.mode1v3
+**/ios/**/*.mode2v3
+**/ios/**/*.moved-aside
+**/ios/**/*.pbxuser
+**/ios/**/*.perspectivev3
+**/ios/**/*sync/
+**/ios/**/.sconsign.dblite
+**/ios/**/.tags*
+**/ios/**/.vagrant/
+**/ios/**/DerivedData/
+**/ios/**/Icon?
+**/ios/**/Pods/
+**/ios/**/.symlinks/
+**/ios/**/profile
+**/ios/**/xcuserdata
+**/ios/.generated/
+**/ios/Flutter/App.framework
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/ephemeral/
+**/ios/Flutter/app.flx
+**/ios/Flutter/app.zip
+**/ios/Flutter/flutter_assets/
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.*
+**/ios/Podfile.lock
+
+# ── IDE ─────────────────────────────────────────────────────
+# IntelliJ / Android Studio
+.idea/
+*.iml
+*.ipr
+*.iws
+.gradle/
+migrate_working_dir/
+
+# VS Code — 개인 설정이라 각자 관리합니다
+.vscode/
+
+# ── OS ──────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ── 임시 파일 ───────────────────────────────────────────────
+*.swp
+*~
+*.bak
+*.tmp
+
+# ── 실수 방지 ───────────────────────────────────────────────
+# 저장소 안에 같은 저장소를 또 클론하면 git이 submodule(gitlink)로
+# 커밋해버려서, 다른 팀원이 클론하면 빈 폴더만 받게 됩니다.
+# 실제로 한 번 발생해서 막아둡니다.
+/goodquestion-frontend/
+
+# 로컬 빌드 산출물 미리보기용 정적 서버 등
+/.playwright-mcp/
+*.screenshot.png
+
+# Claude Code 로컬 작업 캐시(워크트리 등). 사람마다 내용이 달라 공유할 것이 없습니다.
+/.claude/
