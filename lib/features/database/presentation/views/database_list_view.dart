@@ -15,6 +15,7 @@ import '../../../../core/widgets/app_status_chip.dart';
 import '../../domain/entities/db_schema.dart';
 import '../../domain/usecases/database_use_cases.dart';
 import '../viewmodels/database_list_view_model.dart';
+import 'schema_diagram_view.dart';
 
 /// 데이터베이스 테이블 목록.
 ///
@@ -44,6 +45,7 @@ class _DatabaseListBody extends StatelessWidget {
     return AppPage(
       title: '데이터베이스',
       description: '서비스가 저장하는 모든 테이블과 컬럼의 뜻, 실제 값을 볼 수 있습니다. 읽기 전용입니다.',
+      actions: const [SchemaDiagramButton()],
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

@@ -10,6 +10,13 @@ class GetTablesUseCase {
   Future<List<DbTableSummary>> call() => _repository.getTables();
 }
 
+class GetRelationsUseCase {
+  const GetRelationsUseCase(this._repository);
+  final DatabaseRepository _repository;
+
+  Future<DbSchemaGraph> call() => _repository.getRelations();
+}
+
 class GetTableUseCase {
   const GetTableUseCase(this._repository);
   final DatabaseRepository _repository;

@@ -18,6 +18,7 @@ abstract final class AppIcons {
   static const IconData admin = Icons.admin_panel_settings_rounded;
   static const IconData auditLog = Icons.history_rounded;
   static const IconData database = Icons.storage_rounded;
+  static const IconData diagram = Icons.account_tree_rounded;
 
   // 조작
   static const IconData add = Icons.add_rounded;

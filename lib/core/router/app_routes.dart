@@ -43,6 +43,9 @@ abstract final class AppRoutes {
   static const String database = '/database';
   static const String dbTablePath = '/database/:tableName';
 
+  /// 테이블 관계도. ':tableName' 보다 먼저 등록해야 'diagram' 이 테이블 이름으로 잡히지 않는다.
+  static const String dbDiagram = '/database/diagram';
+
   /// 내 계정(비밀번호 변경).
   static const String account = '/account';
 

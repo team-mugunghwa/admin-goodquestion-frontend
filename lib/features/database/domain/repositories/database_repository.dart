@@ -11,6 +11,9 @@ abstract class DatabaseRepository {
 
   Future<DbTableDetail> getTable(String tableName);
 
+  /// 전체 스키마의 상자와 선. 한 번에 받아 화면이 배치를 정합니다.
+  Future<DbSchemaGraph> getRelations();
+
   Future<DbRowPage> getRows({
     required String tableName,
     int page = 0,

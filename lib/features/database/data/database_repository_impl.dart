@@ -28,6 +28,14 @@ class DatabaseRepositoryImpl implements DatabaseRepository {
   );
 
   @override
+  Future<DbSchemaGraph> getRelations() => _guard(
+    () => _client.get(
+      '/database/relations',
+      parse: (data) => _toGraph(_asMap(data)),
+    ),
+  );
+
+  @override
   Future<DbRowPage> getRows({
     required String tableName,
     int page = 0,
@@ -75,6 +83,43 @@ class DatabaseRepositoryImpl implements DatabaseRepository {
     referencesColumn: json['referencesColumn'] as String?,
   );
 
+  static DbSchemaGraph _toGraph(Map<String, dynamic> json) => DbSchemaGraph(
+    tables: (json['tables'] as List? ?? [])
+        .whereType<Map<String, dynamic>>()
+        .map(
+          (table) => DbTableNode(
+            name: table['name'] as String,
+            comment: table['comment'] as String?,
+            group: table['group'] as String? ?? '기타',
+            columnCount: (table['columnCount'] as num?)?.toInt() ?? 0,
+            containsPersonalData: table['containsPersonalData'] as bool? ?? false,
+            keyColumns: (table['keyColumns'] as List? ?? [])
+                .whereType<Map<String, dynamic>>()
+                .map(
+                  (key) => DbKeyColumn(
+                    name: key['name'] as String,
+                    primaryKey: key['primaryKey'] as bool? ?? false,
+                    foreignKey: key['foreignKey'] as bool? ?? false,
+                  ),
+                )
+                .toList(),
+          ),
+        )
+        .toList(),
+    relations: (json['relations'] as List? ?? [])
+        .whereType<Map<String, dynamic>>()
+        .map(
+          (relation) => DbRelation(
+            fromTable: relation['fromTable'] as String,
+            fromColumn: relation['fromColumn'] as String,
+            toTable: relation['toTable'] as String,
+            toColumn: relation['toColumn'] as String,
+            optional: relation['optional'] as bool? ?? false,
+          ),
+        )
+        .toList(),
+  );
+
   static DbTableDetail _toDetail(Map<String, dynamic> json) => DbTableDetail(
     name: json['name'] as String,
     comment: json['comment'] as String?,
@@ -90,6 +135,15 @@ class DatabaseRepositoryImpl implements DatabaseRepository {
             definition: index['definition'] as String? ?? '',
             unique: index['unique'] as bool? ?? false,
             primaryKey: index['primaryKey'] as bool? ?? false,
+          ),
+        )
+        .toList(),
+    referencedBy: (json['referencedBy'] as List? ?? [])
+        .whereType<Map<String, dynamic>>()
+        .map(
+          (reference) => DbIncomingReference(
+            table: reference['table'] as String,
+            column: reference['column'] as String,
           ),
         )
         .toList(),
