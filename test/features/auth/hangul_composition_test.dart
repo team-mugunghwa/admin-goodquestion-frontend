@@ -61,4 +61,39 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
     expect(tester.takeException(), isNull);
   });
+
+  // 이 검사가 있는 이유: 로그인 화면의 Column 은 crossAxisAlignment.stretch 라
+  // 상자의 가로가 패널 폭까지 늘어났고, 그리기 배율을 가로 기준으로 잡고 있어서
+  // 84픽셀 높이 안에 360픽셀 크기로 그려졌다. 그림이 넘쳐 나와 아래 글자를 덮었다.
+  testWidgets('폭이 넓은 부모 안에서도 정사각형 자리를 지킨다', (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            width: 400,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [HangulComposition(), Text('관리자 로그인')],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final box = tester.getSize(
+      find
+          .descendant(
+            of: find.byType(HangulComposition),
+            matching: find.byType(CustomPaint),
+          )
+          .first,
+    );
+    expect(box.width, box.height, reason: '가로가 늘어나면 그림이 넘칩니다');
+    expect(box.width, lessThan(200));
+
+    // 아래 글자가 그림에 덮이지 않아야 합니다.
+    expect(tester.getTopLeft(find.text('관리자 로그인')).dy,
+        greaterThanOrEqualTo(box.height));
+    await tester.pump(const Duration(milliseconds: 700));
+  });
 }

@@ -60,27 +60,34 @@ class _HangulCompositionState extends State<HangulComposition>
     // 움직임을 줄여 달라고 설정한 사용자에게는 다 그려진 모습만 보여 줍니다.
     final reduceMotion = MediaQuery.disableAnimationsOf(context);
 
-    return SizedBox(
-      width: _JamoPainter.canvas,
-      height: _JamoPainter.canvas,
-      child: reduceMotion
-          ? CustomPaint(painter: _JamoPainter(jamo: jamo, drawn: 1, opacity: 1))
-          : AnimatedBuilder(
-              animation: _controller,
-              builder: (context, _) {
-                final t = _controller.value;
-                return CustomPaint(
-                  painter: _JamoPainter(
-                    jamo: jamo,
-                    // 0.00-0.55 그리는 중, 0.55-0.85 유지, 0.85-1.00 사라짐
-                    drawn: Curves.easeInOut.transform(
-                      (t / 0.55).clamp(0.0, 1.0),
+    // Align 으로 감쌉니다. 부모가 crossAxisAlignment.stretch 인 Column 이면
+    // 가로를 패널 폭까지 늘려 버려서, 정사각형이어야 할 자리가 납작하게 눌립니다.
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: SizedBox(
+        width: _JamoPainter.canvas,
+        height: _JamoPainter.canvas,
+        child: reduceMotion
+            ? CustomPaint(
+                painter: _JamoPainter(jamo: jamo, drawn: 1, opacity: 1),
+              )
+            : AnimatedBuilder(
+                animation: _controller,
+                builder: (context, _) {
+                  final t = _controller.value;
+                  return CustomPaint(
+                    painter: _JamoPainter(
+                      jamo: jamo,
+                      // 0.00-0.55 그리는 중, 0.55-0.85 유지, 0.85-1.00 사라짐
+                      drawn: Curves.easeInOut.transform(
+                        (t / 0.55).clamp(0.0, 1.0),
+                      ),
+                      opacity: 1 - ((t - 0.85) / 0.15).clamp(0.0, 1.0),
                     ),
-                    opacity: 1 - ((t - 0.85) / 0.15).clamp(0.0, 1.0),
-                  ),
-                );
-              },
-            ),
+                  );
+                },
+              ),
+      ),
     );
   }
 }
@@ -142,7 +149,11 @@ class _JamoPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (opacity <= 0) return;
 
-    final scale = size.width / _reference;
+    // 짧은 변을 기준으로 배율을 잡습니다. 가로만 보고 잡으면 상자가 옆으로
+    // 길어졌을 때 그림이 넘쳐 나와 옆 위젯을 덮습니다. 실제로 그랬습니다.
+    final side = size.shortestSide;
+    final scale = side / _reference;
+    canvas.translate((size.width - side) / 2, (size.height - side) / 2);
     final paint = Paint()
       ..color = AppColors.primary.withValues(alpha: opacity)
       ..strokeWidth = 9
