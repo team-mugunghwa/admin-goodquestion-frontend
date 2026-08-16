@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/di/injector.dart';
 import '../../../../core/router/app_routes.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/utils/formats.dart';
@@ -12,6 +13,7 @@ import '../../../../core/widgets/app_form.dart';
 import '../../../../core/widgets/app_page.dart';
 import '../../../../core/widgets/app_state_views.dart';
 import '../../../../core/widgets/app_status_chip.dart';
+import '../../../auth/presentation/viewmodels/admin_session.dart';
 import '../../domain/entities/inquiry.dart';
 import '../../domain/usecases/support_use_cases.dart';
 import '../viewmodels/inquiry_list_view_model.dart';
@@ -136,24 +138,16 @@ class _InquiryListBody extends StatelessWidget {
                         ),
                       ),
                       AppColumn(
+                        label: '담당자',
+                        flex: 2,
+                        cellBuilder: (context, inquiry) =>
+                            _AssigneeCell(inquiry: inquiry),
+                      ),
+                      AppColumn(
                         label: '접수일',
                         width: 130,
-                        cellBuilder: (context, inquiry) => Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              Formats.date(inquiry.createdAt),
-                              style: AppTypography.caption,
-                            ),
-                            // 대기 중인 문의는 "얼마나 기다렸는가"가 중요합니다.
-                            if (inquiry.status == InquiryStatus.pending)
-                              Text(
-                                Formats.relative(inquiry.createdAt),
-                                style: AppTypography.caption,
-                              ),
-                          ],
-                        ),
+                        cellBuilder: (context, inquiry) =>
+                            _WaitingCell(inquiry: inquiry),
                       ),
                     ],
                   ),
@@ -165,5 +159,73 @@ class _InquiryListBody extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+/// 담당자 칸. 내 담당이면 색으로 띄웁니다.
+class _AssigneeCell extends StatelessWidget {
+  const _AssigneeCell({required this.inquiry});
+
+  final InquirySummary inquiry;
+
+  @override
+  Widget build(BuildContext context) {
+    final assignee = inquiry.assigneeEmail;
+    if (assignee == null) {
+      return Text('-', style: AppTypography.caption);
+    }
+    final mine = assignee == context.watch<AdminSession>().admin?.email;
+    return Text(
+      mine ? '나' : assignee,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: mine
+          ? AppTypography.bodyStrong.copyWith(color: AppColors.primary)
+          : AppTypography.caption,
+    );
+  }
+}
+
+/// 접수일과 기다린 시간.
+///
+/// 답변 대기 중이면 경과를 색으로 띄웁니다. 하루까지는 보통, 사흘까지는 주황,
+/// 그 뒤로는 빨강입니다. 목록을 열자마자 "무엇부터 답해야 하는가"가 보여야 합니다.
+class _WaitingCell extends StatelessWidget {
+  const _WaitingCell({required this.inquiry});
+
+  final InquirySummary inquiry;
+
+  @override
+  Widget build(BuildContext context) {
+    final waiting = inquiry.waitingSince(DateTime.now());
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(Formats.date(inquiry.createdAt), style: AppTypography.caption),
+        if (waiting != null)
+          Text(
+            '${_label(waiting)} 대기',
+            style: AppTypography.caption.copyWith(
+              color: _color(waiting),
+              fontWeight:
+                  waiting.inHours >= 24 ? FontWeight.w700 : FontWeight.w400,
+            ),
+          ),
+      ],
+    );
+  }
+
+  static String _label(Duration waiting) {
+    if (waiting.inDays >= 1) return '${waiting.inDays}일';
+    if (waiting.inHours >= 1) return '${waiting.inHours}시간';
+    return '${waiting.inMinutes}분';
+  }
+
+  static Color _color(Duration waiting) {
+    if (waiting.inHours >= 72) return AppColors.danger;
+    if (waiting.inHours >= 24) return AppColors.warning;
+    return AppColors.ink500;
   }
 }
