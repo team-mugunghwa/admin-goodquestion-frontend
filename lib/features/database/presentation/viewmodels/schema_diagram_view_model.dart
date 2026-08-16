@@ -12,12 +12,19 @@ class SchemaDiagramViewModel extends BaseViewModel {
   DiagramLayout _layout = const DiagramLayout.empty();
   String? _group;
   String? _focusedTable;
+  bool _hideIsolated = false;
 
   DbSchemaGraph get graph => _graph;
   DiagramLayout get layout => _layout;
 
   /// 보고 있는 분류. null 이면 전체입니다.
   String? get group => _group;
+
+  /// 관계 없는 테이블을 숨기는 중인지.
+  ///
+  /// 기본은 끔입니다. 처음 온 사람에게는 "무엇이 있는가"가 전부 보이는 쪽이
+  /// 맞고, 숨기기는 관계를 읽을 때 켜는 옵션입니다.
+  bool get hideIsolated => _hideIsolated;
 
   /// 누른 상자. 이 상자에 닿는 선만 진하게 그립니다.
   String? get focusedTable => _focusedTable;
@@ -70,8 +77,19 @@ class SchemaDiagramViewModel extends BaseViewModel {
     safeNotify();
   }
 
+  void toggleHideIsolated() {
+    _hideIsolated = !_hideIsolated;
+    _relayout();
+    safeNotify();
+  }
+
   void _relayout() {
-    _layout = SchemaLayout.compute(_graph, group: _group);
+    _layout = SchemaLayout.compute(
+      _graph,
+      group: _group,
+      hideIsolated: _hideIsolated,
+    );
+    // 숨겨진 상자가 눌린 채로 남으면 아래 설명이 화면과 어긋납니다.
     if (_focusedTable != null &&
         !_layout.tables.any((table) => table.name == _focusedTable)) {
       _focusedTable = null;

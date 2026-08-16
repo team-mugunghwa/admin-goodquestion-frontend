@@ -58,18 +58,26 @@ class DiagramLayout {
     required this.tables,
     required this.relations,
     required this.size,
+    this.hiddenIsolatedCount = 0,
   });
 
   const DiagramLayout.empty()
     : tables = const [],
       relations = const [],
-      size = Size.zero;
+      size = Size.zero,
+      hiddenIsolatedCount = 0;
 
   final List<PlacedTable> tables;
   final List<PlacedRelation> relations;
 
   /// 전체가 차지하는 크기. 화면이 이 크기로 캔버스를 잡습니다.
   final Size size;
+
+  /// 관계가 없어 숨긴 테이블 수. 화면이 "몇 개를 숨겼는지" 알려 줄 때 씁니다.
+  ///
+  /// 개수를 같이 주는 이유가 있습니다. 말없이 빼면 "테이블이 39개랬는데 왜
+  /// 32개지"가 되고, 처음 보는 사람은 화면을 의심하게 됩니다.
+  final int hiddenIsolatedCount;
 
   bool get isEmpty => tables.isEmpty;
 }
@@ -107,14 +115,21 @@ abstract final class SchemaLayout {
   /// 참조가 서로 물릴 때 깊이 계산이 끝나지 않는 것을 막는 상한.
   static const int maxDepth = 12;
 
-  static DiagramLayout compute(DbSchemaGraph graph, {String? group}) {
+  /// @param hideIsolated 관계가 하나도 없는 테이블을 뺄지. 마이그레이션 이력이나
+  ///                     공지처럼 홀로 서 있는 테이블은 관계를 읽으러 온 화면에서는
+  ///                     자리만 차지합니다.
+  static DiagramLayout compute(
+    DbSchemaGraph graph, {
+    String? group,
+    bool hideIsolated = false,
+  }) {
     if (graph.isEmpty) return const DiagramLayout.empty();
 
-    final visible = _visibleTables(graph, group);
+    var visible = _visibleTables(graph, group);
     if (visible.isEmpty) return const DiagramLayout.empty();
 
-    final names = visible.map((table) => table.name).toSet();
-    final relations = graph.relations
+    var names = visible.map((table) => table.name).toSet();
+    List<DbRelation> visibleRelations() => graph.relations
         .where(
           (relation) =>
               names.contains(relation.fromTable) &&
@@ -124,6 +139,39 @@ abstract final class SchemaLayout {
         )
         .toList();
 
+    var relations = visibleRelations();
+    var hiddenCount = 0;
+
+    if (hideIsolated) {
+      // 화면에 실제로 선이 그려지는 테이블만 남깁니다. 관계 목록이 아니라 "그려질
+      // 선" 기준인 이유: 자기 자신만 가리키는 테이블은 관계가 있어도 선이 없어서,
+      // 남겨 두면 여전히 외딴 상자로 보입니다.
+      final connected = <String>{};
+      for (final relation in relations) {
+        connected
+          ..add(relation.fromTable)
+          ..add(relation.toTable);
+      }
+      final before = visible.length;
+      visible = visible
+          .where((table) => connected.contains(table.name))
+          .toList();
+      hiddenCount = before - visible.length;
+      if (visible.isEmpty) {
+        // 전부 숨겨졌어도 몇 개를 숨겼는지는 알려 줍니다. 빈 화면만 남으면
+        // 고장으로 보입니다.
+        return DiagramLayout(
+          tables: const [],
+          relations: const [],
+          size: Size.zero,
+          hiddenIsolatedCount: hiddenCount,
+        );
+      }
+
+      names = visible.map((table) => table.name).toSet();
+      relations = visibleRelations();
+    }
+
     final depths = _depths(visible, relations);
     final placed = _place(visible, depths, group);
     final byName = {for (final table in placed) table.name: table};
@@ -132,6 +180,7 @@ abstract final class SchemaLayout {
       tables: placed,
       relations: _connectAll(relations, byName),
       size: _canvasSize(placed),
+      hiddenIsolatedCount: hiddenCount,
     );
   }
 

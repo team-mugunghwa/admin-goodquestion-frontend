@@ -167,6 +167,34 @@ class _GroupFilter extends StatelessWidget {
             selected: viewModel.group == group,
             onTap: () => select(group),
           ),
+        // 분류 칩과 구분되는 자리에 둡니다. 분류는 "무엇을 볼까"이고
+        // 이 토글은 "어떻게 볼까"라서 섞이면 헷갈립니다.
+        const SizedBox(width: AppSpacing.sm),
+        FilterChip(
+          label: const Text('관계 없는 테이블 숨기기'),
+          selected: viewModel.hideIsolated,
+          onSelected: (_) =>
+              context.read<SchemaDiagramViewModel>().toggleHideIsolated(),
+          labelStyle: AppTypography.caption.copyWith(
+            color: viewModel.hideIsolated
+                ? AppColors.primary
+                : AppColors.ink700,
+          ),
+          selectedColor: AppColors.primarySurface,
+          backgroundColor: AppColors.surface,
+          checkmarkColor: AppColors.primary,
+          side: BorderSide(
+            color: viewModel.hideIsolated
+                ? AppColors.primary
+                : AppColors.ink100,
+          ),
+        ),
+        if (viewModel.hideIsolated && viewModel.layout.hiddenIsolatedCount > 0)
+          Text(
+            // 말없이 빼면 테이블 수가 안 맞아 화면을 의심하게 됩니다.
+            '${viewModel.layout.hiddenIsolatedCount}개를 숨겼습니다. 마이그레이션 이력처럼 홀로 있는 테이블입니다.',
+            style: AppTypography.caption,
+          ),
         if (viewModel.group != null)
           Text(
             '맞닿은 테이블은 흐리게 함께 보여 줍니다.',
