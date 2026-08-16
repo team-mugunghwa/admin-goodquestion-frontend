@@ -5,7 +5,7 @@ import '../theme/app_spacing.dart';
 
 /// 되돌릴 수 없는 조작 전에 한 번 묻습니다.
 ///
-/// 삭제, 정지, 로그인 세션 종료가 대상입니다. **저장에는 쓰지 마세요** — 저장은
+/// 삭제, 정지, 로그인 세션 종료가 대상입니다. **저장에는 쓰지 마세요** - 저장은
 /// 되돌릴 수 있고, 매번 확인을 받으면 사람이 내용을 읽지 않고 누르게 됩니다.
 /// 확인 창이 늘어날수록 정작 위험한 것에서도 그냥 누르게 됩니다.
 Future<bool> showConfirmDialog(
@@ -111,7 +111,7 @@ Future<String?> showPromptDialog(
 
 /// 조작 결과를 알립니다.
 ///
-/// 성공은 짧게, 실패는 길게 띄웁니다 — 실패 메시지는 읽고 조치해야 하는 글입니다.
+/// 성공은 짧게, 실패는 길게 띄웁니다 - 실패 메시지는 읽고 조치해야 하는 글입니다.
 void showResultSnackBar(
   BuildContext context, {
   required bool success,

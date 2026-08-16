@@ -33,7 +33,7 @@ import '../network/dio_client.dart';
 /// 앱 전역 서비스 로케이터.
 ///
 /// ## 여기에 등록하는 것 / 안 하는 것
-/// - Repository, UseCase, DataSource, DioClient — 위젯 트리와 무관한 객체
+/// - Repository, UseCase, DataSource, DioClient - 위젯 트리와 무관한 객체
 /// - ViewModel 은 등록하지 않습니다. 화면 생명주기를 따라야 하므로
 ///   `ChangeNotifierProvider` 로 만듭니다. 단 하나의 예외가 [AdminSession] 인데,
 ///   앱 전체가 공유하는 로그인 상태라 `app.dart` 의 MultiProvider 에 올립니다.
@@ -98,7 +98,7 @@ void _registerDashboard() {
     );
 }
 
-/// 공지 · 이용안내 · 이야기 — 사용자 앱에 그대로 나가는 콘텐츠.
+/// 공지 / 이용안내 / 이야기 - 사용자 앱에 그대로 나가는 콘텐츠.
 void _registerContent() {
   getIt
     ..registerLazySingleton<NoticeRepository>(
@@ -136,7 +136,7 @@ void _registerContent() {
     ..registerLazySingleton(() => GetTopicsUseCase(getIt<StoryRepository>()));
 }
 
-/// 사용자 관리 · 고객센터 · 감사 로그 — 운영 업무.
+/// 사용자 관리 / 고객센터 / 감사 로그 - 운영 업무.
 void _registerOperations() {
   getIt
     ..registerLazySingleton<MemberRepository>(

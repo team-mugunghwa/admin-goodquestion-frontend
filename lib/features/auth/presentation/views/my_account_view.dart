@@ -15,7 +15,7 @@ import '../viewmodels/admin_session.dart';
 /// 내 계정 - 비밀번호 변경.
 ///
 /// 비밀번호를 바꾸면 서버가 이 계정의 리프레시 토큰을 전부 끊습니다. 그래서 저장
-/// 직후 로그아웃되어 로그인 화면으로 돌아갑니다 — 바꾼 이유가 유출 의심일 수 있어
+/// 직후 로그아웃되어 로그인 화면으로 돌아갑니다 - 바꾼 이유가 유출 의심일 수 있어
 /// 다른 기기의 세션을 남겨 두면 바꾼 의미가 없습니다.
 class MyAccountView extends StatefulWidget {
   const MyAccountView({super.key});

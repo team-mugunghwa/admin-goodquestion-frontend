@@ -2,7 +2,7 @@ import 'exceptions.dart';
 
 /// domain / presentation 이 다루는 실패 타입.
 ///
-/// `Exception` 과 나누는 이유: domain 레이어가 Dio·HTTP 같은 바깥 기술을 몰라야
+/// `Exception` 과 나누는 이유: domain 레이어가 Dio/HTTP 같은 바깥 기술을 몰라야
 /// 하기 때문입니다. data 레이어가 [Failure.fromException] 으로 번역합니다.
 ///
 /// `sealed` 라서 switch 에서 모든 경우를 처리했는지 컴파일러가 검사해 줍니다.

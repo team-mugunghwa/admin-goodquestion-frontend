@@ -10,7 +10,7 @@ import '../viewmodels/admin_session.dart';
 /// 로그인. 셸 바깥에 있는 유일한 화면입니다.
 ///
 /// 로그인 성공 후의 이동은 여기서 하지 않습니다. 세션이 바뀌면 라우터의 redirect 가
-/// 알아서 보냅니다 — 화면이 직접 `context.go` 를 부르면 그 판단이 두 군데로 갈립니다.
+/// 알아서 보냅니다 - 화면이 직접 `context.go` 를 부르면 그 판단이 두 군데로 갈립니다.
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
 

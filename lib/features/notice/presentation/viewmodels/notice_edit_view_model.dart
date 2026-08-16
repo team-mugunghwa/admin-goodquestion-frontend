@@ -3,7 +3,7 @@ import '../../../../core/presentation/base_view_model.dart';
 import '../../domain/entities/notice.dart';
 import '../../domain/usecases/notice_use_cases.dart';
 
-/// 공지 작성·수정 화면의 상태.
+/// 공지 작성/수정 화면의 상태.
 ///
 /// 새 글([noticeId] 가 null)과 수정을 한 ViewModel 로 다룹니다. 화면이 거의 같고,
 /// 나누면 폼 검증과 저장 흐름을 두 벌 유지하게 됩니다.

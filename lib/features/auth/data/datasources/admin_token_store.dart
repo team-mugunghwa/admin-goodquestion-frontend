@@ -4,7 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 ///
 /// 웹에서는 `flutter_secure_storage` 가 브라우저 저장소를 씁니다. 브라우저에서 완전한
 /// 비밀 보관은 불가능하므로, 짧은 액세스 토큰(30분)과 회전하는 리프레시 토큰으로
-/// 노출 창을 좁히는 쪽에 기댑니다 — 이건 서버 쪽 설계와 짝을 이루는 결정입니다.
+/// 노출 창을 좁히는 쪽에 기댑니다 - 이건 서버 쪽 설계와 짝을 이루는 결정입니다.
 class AdminTokenStore {
   AdminTokenStore({FlutterSecureStorage? storage})
     : _storage = storage ?? const FlutterSecureStorage();

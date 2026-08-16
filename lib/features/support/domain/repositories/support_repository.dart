@@ -22,7 +22,7 @@ abstract class SupportRepository {
     required String content,
   });
 
-  /// 답변 내용을 고칩니다. **알림은 다시 나가지 않습니다** — 오타를 고칠 때마다
+  /// 답변 내용을 고칩니다. **알림은 다시 나가지 않습니다** - 오타를 고칠 때마다
   /// 사용자 기기에 푸시가 울리면 알림 자체가 무시됩니다.
   Future<InquiryAnswer> updateAnswer({
     required String inquiryId,

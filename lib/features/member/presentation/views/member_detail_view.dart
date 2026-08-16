@@ -168,7 +168,7 @@ class _SuspendedBanner extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            '${Formats.dateTime(member.suspendedAt)} · ${member.suspendedReason ?? "사유 없음"}',
+            '${Formats.dateTime(member.suspendedAt)} / ${member.suspendedReason ?? "사유 없음"}',
             style: AppTypography.caption.copyWith(color: AppColors.danger),
           ),
         ],
@@ -273,7 +273,7 @@ class _ChildrenCard extends StatelessWidget {
                   Text(child.name, style: AppTypography.bodyStrong),
                   const SizedBox(height: 2),
                   Text(
-                    '${child.birthYear}년생 · 등록 ${Formats.date(child.createdAt)}',
+                    '${child.birthYear}년생 / 등록 ${Formats.date(child.createdAt)}',
                     style: AppTypography.caption,
                   ),
                 ],
@@ -320,7 +320,7 @@ class _LoginSessionsCard extends StatelessWidget {
                     const AppStatusChip(label: '사용중', tone: StatusTone.positive),
                     const SizedBox(width: AppSpacing.md),
                     Text(
-                      '로그인 ${Formats.dateTime(session.createdAt)} · '
+                      '로그인 ${Formats.dateTime(session.createdAt)} / '
                       '만료 ${Formats.dateTime(session.expiresAt)}',
                       style: AppTypography.caption,
                     ),

@@ -53,7 +53,7 @@ class _InquiryDetailBody extends StatefulWidget {
 class _InquiryDetailBodyState extends State<_InquiryDetailBody> {
   final _answerController = TextEditingController();
 
-  /// 답변을 고치는 중인지. 이미 답변이 있으면 기본은 읽기 모드입니다 —
+  /// 답변을 고치는 중인지. 이미 답변이 있으면 기본은 읽기 모드입니다 -
   /// 편집 상자를 바로 열어 두면 실수로 덮어쓰기 쉽습니다.
   bool _editing = false;
   String? _loadedAnswerFor;

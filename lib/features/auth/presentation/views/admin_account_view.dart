@@ -102,7 +102,7 @@ class _AdminAccountBody extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      // 자기 계정은 정지·삭제가 막혀 있습니다. 그 이유를 표에서도 보이게 합니다.
+                      // 자기 계정은 정지/삭제가 막혀 있습니다. 그 이유를 표에서도 보이게 합니다.
                       if (admin.id == me?.id)
                         const Padding(
                           padding: EdgeInsets.only(left: AppSpacing.sm),

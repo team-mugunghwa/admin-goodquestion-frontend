@@ -18,7 +18,7 @@ import '../../domain/entities/notice.dart';
 import '../../domain/usecases/notice_use_cases.dart';
 import '../viewmodels/notice_edit_view_model.dart';
 
-/// 공지 작성·수정. [noticeId] 가 null 이면 새 글입니다.
+/// 공지 작성/수정. [noticeId] 가 null 이면 새 글입니다.
 class NoticeEditView extends StatelessWidget {
   const NoticeEditView({this.noticeId, super.key});
 
@@ -103,7 +103,7 @@ class _NoticeEditBodyState extends State<_NoticeEditBody> {
       backRoute: AppRoutes.notices,
       description: vm.notice == null
           ? null
-          : '조회 ${Formats.count(vm.notice!.viewCount)}회 · '
+          : '조회 ${Formats.count(vm.notice!.viewCount)}회 / '
                 '마지막 수정 ${Formats.dateTime(vm.notice!.updatedAt)}',
       actions: [
         OutlinedButton(

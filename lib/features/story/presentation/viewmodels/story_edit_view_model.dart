@@ -60,7 +60,7 @@ class StoryEditViewModel extends BaseViewModel {
   List<String> get selectedTopics => _selectedTopics;
   bool get isNew => storyId == null;
 
-  /// 장면이 없으면 공개할 수 없습니다. 서버도 막지만 화면에서 미리 알려 줍니다 —
+  /// 장면이 없으면 공개할 수 없습니다. 서버도 막지만 화면에서 미리 알려 줍니다 -
   /// 저장을 눌러 오류를 보고 나서야 아는 것보다 낫습니다.
   bool get canPublish => _scenes.isNotEmpty;
 

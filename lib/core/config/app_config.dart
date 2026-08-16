@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 /// flutter run -d chrome --dart-define-from-file=env/local.json
 /// ```
 ///
-/// `.env` 파일 방식을 쓰지 않는 이유는 서비스 프론트엔드와 같습니다 — 파일이 없으면
+/// `.env` 파일 방식을 쓰지 않는 이유는 서비스 프론트엔드와 같습니다 - 파일이 없으면
 /// 런타임에 죽는데, `--dart-define` 은 기본값이 있어 클론 직후에도 그냥 실행됩니다.
 abstract final class AppConfig {
   static const String _rawBaseUrl = String.fromEnvironment('API_BASE_URL');
