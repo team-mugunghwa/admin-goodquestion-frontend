@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -44,6 +45,11 @@ class _GoodQuestionAdminAppState extends State<GoodQuestionAdminApp> {
         // 다크 모드는 만들지 않습니다. 표와 상태 배지가 화면의 대부분이라
         // 두 벌을 검수할 여력이 없고, 운영자가 낮에 보는 화면입니다.
         themeMode: ThemeMode.light,
+        // 달력(기간 필터) 같은 머티리얼 위젯이 한국어로 나오게 합니다.
+        // 이것 없이 위젯에 로케일만 지정하면 지원 목록에 없다며 죽습니다.
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
+        supportedLocales: const [Locale('ko'), Locale('en')],
+        locale: const Locale('ko'),
         routerConfig: _router,
       ),
     );
