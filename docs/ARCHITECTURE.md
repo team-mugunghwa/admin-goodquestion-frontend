@@ -41,8 +41,8 @@ lib/
 |   +-- theme/                  # 색/간격/글자 토큰
 |   +-- utils/formats.dart      # 날짜/숫자 표기
 |   +-- widgets/                # 셸/표/배지/폼/대화상자
-+-- features/                   # auth / dashboard / story / member /
-    +-- notice/                 # notice / support / guide / audit
++-- features/                   # auth / dashboard / story / member / notice /
+    +-- notice/                 # support / guide / audit / database
         +-- data/
         +-- domain/{entities,repositories,usecases}
         +-- presentation/{viewmodels,views,widgets}
@@ -75,6 +75,7 @@ DioClient 가 그 함수를 직접 참조합니다.
 | `/notices`, `/notices/new`, `/notices/:noticeId` | 공지사항 |
 | `/inquiries`, `/inquiries/:inquiryId` | 고객센터 |
 | `/guides` | 이용안내 |
+| `/database`, `/database/:tableName` | 데이터베이스 둘러보기. 읽기 전용 |
 | `/admins` | 관리자 계정 (최고관리자) |
 | `/audit-logs` | 감사 로그 |
 | `/account` | 비밀번호 변경 |
