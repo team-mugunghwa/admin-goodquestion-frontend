@@ -82,6 +82,7 @@ class DbTableDetail {
     required this.containsPersonalData,
     required this.columns,
     required this.indexes,
+    this.referencedBy = const [],
     this.comment,
   });
 
@@ -94,6 +95,9 @@ class DbTableDetail {
   final bool containsPersonalData;
   final List<DbColumn> columns;
   final List<DbIndex> indexes;
+
+  /// 이 테이블을 가리키는 곳. 지울 때 무엇이 걸리는지 알려면 필요합니다.
+  final List<DbIncomingReference> referencedBy;
 }
 
 /// 실제 저장된 값 한 페이지.
@@ -129,4 +133,84 @@ class DbRowPage {
   bool get isEmpty => rows.isEmpty;
   bool get hasPrevious => page > 0;
   bool get hasNext => page + 1 < totalPages;
+}
+
+/// 관계도의 상자 하나.
+class DbTableNode {
+  const DbTableNode({
+    required this.name,
+    required this.group,
+    required this.columnCount,
+    required this.containsPersonalData,
+    required this.keyColumns,
+    this.comment,
+  });
+
+  final String name;
+  final String? comment;
+  final String group;
+  final int columnCount;
+  final bool containsPersonalData;
+
+  /// 기본키와 외래키만. 관계를 읽는 데 필요한 것이 이 둘입니다.
+  final List<DbKeyColumn> keyColumns;
+
+  /// 상자에 크게 적을 이름. 설명이 있으면 설명의 첫 문장을 씁니다.
+  String get title => comment == null ? name : comment!.split('.').first;
+}
+
+class DbKeyColumn {
+  const DbKeyColumn({
+    required this.name,
+    required this.primaryKey,
+    required this.foreignKey,
+  });
+
+  final String name;
+  final bool primaryKey;
+  final bool foreignKey;
+}
+
+/// 관계 하나. 외래키 한 쌍입니다.
+class DbRelation {
+  const DbRelation({
+    required this.fromTable,
+    required this.fromColumn,
+    required this.toTable,
+    required this.toColumn,
+    required this.optional,
+  });
+
+  /// 가리키는 쪽. 여러 건이 있을 수 있는 "N" 입니다.
+  final String fromTable;
+  final String fromColumn;
+
+  /// 가리켜지는 쪽. 하나뿐인 "1" 입니다.
+  final String toTable;
+  final String toColumn;
+
+  /// 참조하는 컬럼이 null 을 받는지. 받으면 없을 수도 있는 관계입니다.
+  final bool optional;
+
+  bool touches(String table) => fromTable == table || toTable == table;
+}
+
+/// 관계도 전체.
+class DbSchemaGraph {
+  const DbSchemaGraph({required this.tables, required this.relations});
+
+  const DbSchemaGraph.empty() : tables = const [], relations = const [];
+
+  final List<DbTableNode> tables;
+  final List<DbRelation> relations;
+
+  bool get isEmpty => tables.isEmpty;
+}
+
+/// 이 테이블을 가리키는 쪽.
+class DbIncomingReference {
+  const DbIncomingReference({required this.table, required this.column});
+
+  final String table;
+  final String column;
 }
