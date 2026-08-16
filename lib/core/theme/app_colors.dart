@@ -76,6 +76,14 @@ abstract final class AppColors {
   static const Color navSelected = Color(0xFF2A3B5E);
   static const Color navLabel = Color(0xFFB6C2D9);
 
+  /// 어두운 면 위에서 쓰는 브랜드 색. 로고의 하늘색에서 가져왔습니다.
+  ///
+  /// **흰 배경에는 쓰지 않습니다.** 로고 색을 그대로 쓰면 흰 배경 대비가
+  /// 2.2:1 밖에 안 나와 글자와 버튼에 쓸 수 없습니다. 같은 색이 남색 위에서는
+  /// 8.9:1 이라 아주 잘 읽힙니다. 그래서 밝은 면의 강조는 [primary] 가,
+  /// 어두운 면의 강조는 이 색이 맡습니다.
+  static const Color primaryOnDark = Color(0xFF90CCE4);
+
   /// 카드 그림자. 검정 대신 잉크색을 옅게 깔아야 회색 때처럼 보이지 않습니다.
   static const List<BoxShadow> cardShadow = [
     BoxShadow(color: Color(0x0A16233F), blurRadius: 2, offset: Offset(0, 1)),

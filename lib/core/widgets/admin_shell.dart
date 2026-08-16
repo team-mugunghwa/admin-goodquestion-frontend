@@ -206,7 +206,9 @@ class _NavTile extends StatelessWidget {
                 item.icon,
                 size: AppSizes.icon,
                 // 선택 여부를 색만으로 구분하지 않습니다. 배경 면도 함께 바뀝니다.
-                color: selected ? AppColors.surface : AppColors.navLabel,
+                // 선택된 항목에는 브랜드 하늘색을 씁니다. 어두운 면 위에서만
+                // 쓸 수 있는 색이라(흰 배경 대비 2.2:1) 여기가 제자리입니다.
+                color: selected ? AppColors.primaryOnDark : AppColors.navLabel,
               ),
               if (!collapsed) ...[
                 const SizedBox(width: AppSpacing.md),

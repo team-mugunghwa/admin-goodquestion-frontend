@@ -6,6 +6,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_form.dart';
 import '../viewmodels/admin_session.dart';
+import '../widgets/hangul_composition.dart';
 
 /// 로그인. 셸 바깥에 있는 유일한 화면입니다.
 ///
@@ -107,8 +108,8 @@ class _LoginForm extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const _BrandMark(),
-                const SizedBox(height: AppSpacing.xxxl),
+                const HangulComposition(),
+                const SizedBox(height: AppSpacing.xl),
 
                 Text('관리자 로그인', style: AppTypography.pageTitle),
                 const SizedBox(height: AppSpacing.xs),
@@ -182,46 +183,6 @@ class _LoginForm extends StatelessWidget {
   }
 }
 
-class _BrandMark extends StatelessWidget {
-  const _BrandMark();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            color: AppColors.primary,
-            borderRadius: BorderRadius.circular(AppRadius.md),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            'Q',
-            style: AppTypography.bodyStrong.copyWith(
-              color: AppColors.surface,
-              fontSize: 20,
-            ),
-          ),
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'GoodQuestion',
-              style: AppTypography.bodyStrong.copyWith(fontSize: 18),
-            ),
-            Text('관리자 사이트', style: AppTypography.caption),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
 /// 오른쪽 소개 영역.
 ///
 /// 좌측 메뉴와 같은 남색을 씁니다. 이 콘솔에서 어두운 면은 이 한 가지뿐이라,
@@ -234,20 +195,12 @@ class _BrandPanel extends StatelessWidget {
     return Container(
       // clipBehavior 를 주려면 color 가 아니라 decoration 이어야 합니다.
       decoration: const BoxDecoration(color: AppColors.navSurface),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
+      child: const Padding(
+        padding: EdgeInsets.symmetric(
           horizontal: AppSpacing.xxxl,
           vertical: AppSpacing.xxl,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const _Statement(),
-            const SizedBox(height: AppSpacing.xl),
-            Container(width: 48, height: 3, color: AppColors.primary),
-          ],
-        ),
+        child: Align(alignment: Alignment.centerLeft, child: _Statement()),
       ),
     );
   }
