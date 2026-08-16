@@ -24,6 +24,18 @@ DbSchemaGraph _wideGraph() {
         ],
       ),
   ];
+  tables.add(
+    const DbTableNode(
+      name: 'flyway_schema_history',
+      comment: '마이그레이션 이력',
+      group: '시스템',
+      columnCount: 4,
+      containsPersonalData: false,
+      keyColumns: [
+        DbKeyColumn(name: 'installed_rank', primaryKey: true, foreignKey: false),
+      ],
+    ),
+  );
   return DbSchemaGraph(
     tables: tables,
     relations: [
@@ -88,5 +100,41 @@ void main() {
 
     expect(find.textContaining('table_0'), findsWidgets);
     expect(_scaleOf(tester), before);
+  });
+
+  testWidgets('숨기기 토글을 누르면 관계 없는 상자가 사라진다', (tester) async {
+    await pumpDiagram(tester);
+
+    // 고립 테이블까지 전부 보이는 상태에서 시작한다.
+    expect(find.text('마이그레이션 이력'), findsOneWidget);
+
+    await tester.tap(find.text('관계 없는 테이블 숨기기'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('마이그레이션 이력'), findsNothing);
+    // 몇 개를 숨겼는지도 보여야 한다. 말없이 빼면 화면을 의심하게 된다.
+    expect(find.textContaining('1개를 숨겼습니다'), findsOneWidget);
+
+    // 다시 누르면 돌아온다.
+    await tester.tap(find.text('관계 없는 테이블 숨기기'));
+    await tester.pumpAndSettle();
+    expect(find.text('마이그레이션 이력'), findsOneWidget);
+  });
+
+  testWidgets('전부 숨겨져도 필터 바가 남아 되돌릴 수 있다', (tester) async {
+    await pumpDiagram(tester);
+
+    // 고립 테이블만 있는 분류로 좁힌 뒤 숨기면 화면에 남는 상자가 없다.
+    await tester.tap(find.text('시스템'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('관계 없는 테이블 숨기기'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('보여 줄 테이블이 없습니다'), findsOneWidget);
+
+    // 여기서 토글이 사라지면 되돌릴 방법이 없다. 실제로 그런 함정이 있었다.
+    await tester.tap(find.text('관계 없는 테이블 숨기기'));
+    await tester.pumpAndSettle();
+    expect(find.text('마이그레이션 이력'), findsOneWidget);
   });
 }

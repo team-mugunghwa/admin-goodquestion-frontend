@@ -117,7 +117,9 @@ class _SchemaDiagramBodyState extends State<_SchemaDiagramBody> {
         state: vm.state,
         errorMessage: vm.errorMessage,
         onRetry: () => context.read<SchemaDiagramViewModel>().load(),
-        isEmpty: vm.layout.isEmpty,
+        // 그래프 자체가 비었을 때만 빈 화면입니다. 필터로 다 숨겨진 경우까지
+        // 빈 화면으로 바꾸면 필터 바가 함께 사라져서 토글을 되돌릴 수 없습니다.
+        isEmpty: vm.graph.isEmpty,
         emptyTitle: '그릴 관계가 없습니다',
         builder: (context) {
           _fitOnce(vm.layout);
@@ -166,6 +168,34 @@ class _GroupFilter extends StatelessWidget {
             label: group,
             selected: viewModel.group == group,
             onTap: () => select(group),
+          ),
+        // 분류 칩과 구분되는 자리에 둡니다. 분류는 "무엇을 볼까"이고
+        // 이 토글은 "어떻게 볼까"라서 섞이면 헷갈립니다.
+        const SizedBox(width: AppSpacing.sm),
+        FilterChip(
+          label: const Text('관계 없는 테이블 숨기기'),
+          selected: viewModel.hideIsolated,
+          onSelected: (_) =>
+              context.read<SchemaDiagramViewModel>().toggleHideIsolated(),
+          labelStyle: AppTypography.caption.copyWith(
+            color: viewModel.hideIsolated
+                ? AppColors.primary
+                : AppColors.ink700,
+          ),
+          selectedColor: AppColors.primarySurface,
+          backgroundColor: AppColors.surface,
+          checkmarkColor: AppColors.primary,
+          side: BorderSide(
+            color: viewModel.hideIsolated
+                ? AppColors.primary
+                : AppColors.ink100,
+          ),
+        ),
+        if (viewModel.hideIsolated && viewModel.layout.hiddenIsolatedCount > 0)
+          Text(
+            // 말없이 빼면 테이블 수가 안 맞아 화면을 의심하게 됩니다.
+            '${viewModel.layout.hiddenIsolatedCount}개를 숨겼습니다. 마이그레이션 이력처럼 홀로 있는 테이블입니다.',
+            style: AppTypography.caption,
           ),
         if (viewModel.group != null)
           Text(
@@ -231,6 +261,21 @@ class _Canvas extends StatelessWidget {
   }
 
   Widget _canvas(BuildContext context, DiagramLayout layout) {
+    // 필터로 전부 숨겨진 경우. 빈 캔버스만 두면 고장으로 보입니다.
+    if (layout.isEmpty) {
+      return Container(
+        decoration: BoxDecoration(
+          color: AppColors.canvas,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          border: Border.all(color: AppColors.ink100),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          '지금 조건에서는 보여 줄 테이블이 없습니다. 위 필터를 조정해 보세요.',
+          style: AppTypography.caption,
+        ),
+      );
+    }
     return Container(
       decoration: BoxDecoration(
         color: AppColors.canvas,
