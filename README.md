@@ -41,4 +41,5 @@ flutter analyze && flutter test
 서비스 프론트엔드와 같습니다. **MVVM + 클린 아키텍처**, 상태관리는 Provider,
 DI는 get_it, 라우팅은 go_router, HTTP는 Dio입니다. 자세한 내용은
 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), 화면 규칙은
-[docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md)를 보세요.
+[docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md), 배포는
+[docs/deploy-vercel.md](docs/deploy-vercel.md)를 보세요.
