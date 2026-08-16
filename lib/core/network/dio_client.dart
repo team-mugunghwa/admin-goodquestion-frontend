@@ -117,6 +117,13 @@ class DioClient {
   Future<void> delete(String path) =>
       _request<void>(path, () => _dio.delete<dynamic>(path), (_) {});
 
+  /// 지운 뒤의 상태를 본문으로 돌려주는 DELETE. 예약 취소처럼 지우고 나서
+  /// 화면을 그 응답으로 바로 갱신할 때 쓴다.
+  Future<T> deleteAndParse<T>(
+    String path, {
+    required T Function(Object? data) parse,
+  }) => _request(path, () => _dio.delete<dynamic>(path), parse);
+
   Future<T> _request<T>(
     String path,
     Future<Response<dynamic>> Function() send,
