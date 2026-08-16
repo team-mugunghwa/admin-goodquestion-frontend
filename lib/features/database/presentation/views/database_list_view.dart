@@ -98,24 +98,26 @@ class _GroupSection extends StatelessWidget {
     return AppCard(
       title: '$group (${tables.length})',
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          // 카드 폭에 따라 2열 또는 1열. 설명이 한 줄에 담겨야 훑을 수 있습니다.
-          final columns = constraints.maxWidth >= 900 ? 2 : 1;
-          final width =
-              (constraints.maxWidth - AppSpacing.lg * (columns - 1)) / columns;
-          return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-            child: Wrap(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            // 카드 폭에 따라 2열 또는 1열. 설명이 한 줄에 담겨야 훑을 수 있습니다.
+            // LayoutBuilder 를 좌우 여백 **안쪽**에 두어야 합니다. 바깥에 두면
+            // 여백을 뺀 폭보다 넓게 계산해서 두 칸이 안 들어가고 1열로 접힙니다.
+            final columns = constraints.maxWidth >= 880 ? 2 : 1;
+            final width =
+                (constraints.maxWidth - AppSpacing.lg * (columns - 1)) / columns;
+            return Wrap(
               spacing: AppSpacing.lg,
               runSpacing: AppSpacing.sm,
               children: [
                 for (final table in tables)
                   SizedBox(width: width, child: _TableRow(table: table)),
               ],
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
