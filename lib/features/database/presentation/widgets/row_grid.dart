@@ -128,7 +128,7 @@ class _FilterBarState extends State<_FilterBar> {
   }
 }
 
-class _Grid extends StatelessWidget {
+class _Grid extends StatefulWidget {
   const _Grid({required this.page});
 
   final DbRowPage page;
@@ -137,15 +137,36 @@ class _Grid extends StatelessWidget {
   static const double _columnWidth = 200;
 
   @override
+  State<_Grid> createState() => _GridState();
+}
+
+class _GridState extends State<_Grid> {
+  /// 가로 스크롤바에 붙일 컨트롤러.
+  ///
+  /// 항상 보이는 스크롤바(thumbVisibility)는 어느 스크롤을 가리키는지 알아야
+  /// 합니다. 컨트롤러를 주지 않으면 기본 컨트롤러를 찾아가는데, 이 표에는 세로
+  /// 목록도 함께 있어서 둘 중 어느 쪽인지 정해지지 않습니다.
+  final ScrollController _horizontal = ScrollController();
+
+  @override
+  void dispose() {
+    _horizontal.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final page = widget.page;
     final vm = context.read<TableDetailViewModel>();
 
     return Scrollbar(
+      controller: _horizontal,
       thumbVisibility: true,
       child: SingleChildScrollView(
+        controller: _horizontal,
         scrollDirection: Axis.horizontal,
         child: SizedBox(
-          width: page.columns.length * _columnWidth,
+          width: page.columns.length * _Grid._columnWidth,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
