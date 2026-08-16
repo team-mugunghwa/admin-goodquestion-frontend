@@ -12,14 +12,26 @@ class NoticeEditViewModel extends BaseViewModel {
     required GetNoticeUseCase getNotice,
     required CreateNoticeUseCase createNotice,
     required UpdateNoticeUseCase updateNotice,
+    required GetNoticeRevisionsUseCase getRevisions,
+    required RevertNoticeUseCase revertNotice,
+    required ScheduleNoticeUseCase scheduleNotice,
+    required CancelNoticeScheduleUseCase cancelSchedule,
     this.noticeId,
   }) : _getNotice = getNotice,
        _createNotice = createNotice,
-       _updateNotice = updateNotice;
+       _updateNotice = updateNotice,
+       _getRevisions = getRevisions,
+       _revertNotice = revertNotice,
+       _scheduleNotice = scheduleNotice,
+       _cancelSchedule = cancelSchedule;
 
   final GetNoticeUseCase _getNotice;
   final CreateNoticeUseCase _createNotice;
   final UpdateNoticeUseCase _updateNotice;
+  final GetNoticeRevisionsUseCase _getRevisions;
+  final RevertNoticeUseCase _revertNotice;
+  final ScheduleNoticeUseCase _scheduleNotice;
+  final CancelNoticeScheduleUseCase _cancelSchedule;
 
   /// null 이면 새 글입니다.
   final String? noticeId;
@@ -85,5 +97,53 @@ class NoticeEditViewModel extends BaseViewModel {
       _notice = saved;
     });
     return ok ? saved : null;
+  }
+
+  /// 이전 내용들. 이력 대화상자가 부를 때만 서버에 다녀옵니다.
+  Future<List<NoticeRevision>> loadRevisions() async {
+    if (noticeId == null) return const [];
+    return _getRevisions(noticeId!);
+  }
+
+  /// 그 시점 내용으로 되돌립니다. 성공하면 화면 상태도 그 내용으로 바뀝니다.
+  Future<NoticeDetail?> revert(String revisionId) async {
+    if (noticeId == null) return null;
+    NoticeDetail? reverted;
+    final ok = await runTask(() async {
+      reverted = await _revertNotice(
+        noticeId: noticeId!,
+        revisionId: revisionId,
+      );
+    });
+    if (ok && reverted != null) {
+      _applyDetail(reverted!);
+    }
+    return ok ? reverted : null;
+  }
+
+  Future<bool> schedule(DateTime publishAt) async {
+    if (noticeId == null) return false;
+    final ok = await runTask(() async {
+      _applyDetail(
+        await _scheduleNotice(noticeId: noticeId!, publishAt: publishAt),
+      );
+    });
+    return ok;
+  }
+
+  Future<bool> cancelSchedule() async {
+    if (noticeId == null) return false;
+    final ok = await runTask(() async {
+      _applyDetail(await _cancelSchedule(noticeId!));
+    });
+    return ok;
+  }
+
+  void _applyDetail(NoticeDetail detail) {
+    _notice = detail;
+    _category = detail.category;
+    _status = detail.status;
+    _pinned = detail.pinned;
+    safeNotify();
   }
 }

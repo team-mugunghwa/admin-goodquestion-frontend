@@ -56,6 +56,7 @@ class NoticeDetail {
     this.publishedAt,
     this.authorName,
     this.updatedAt,
+    this.scheduledPublishAt,
   });
 
   final String id;
@@ -68,4 +69,30 @@ class NoticeDetail {
   final DateTime? publishedAt;
   final String? authorName;
   final DateTime? updatedAt;
+
+  /// 예약 공개 시각. 걸려 있지 않으면 null 입니다.
+  final DateTime? scheduledPublishAt;
+
+  bool get isScheduled => scheduledPublishAt != null;
+}
+
+/// 공지의 이전 내용 한 장. 되돌리기의 재료입니다.
+class NoticeRevision {
+  const NoticeRevision({
+    required this.id,
+    required this.title,
+    required this.content,
+    required this.category,
+    required this.pinned,
+    required this.editedByEmail,
+    this.createdAt,
+  });
+
+  final String id;
+  final String title;
+  final String content;
+  final NoticeCategory category;
+  final bool pinned;
+  final String editedByEmail;
+  final DateTime? createdAt;
 }

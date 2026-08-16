@@ -31,4 +31,21 @@ abstract class NoticeRepository {
   });
 
   Future<void> deleteNotice(String noticeId);
+
+  /// 이전 내용들. 최신이 위입니다.
+  Future<List<NoticeRevision>> getRevisions(String noticeId);
+
+  /// 그 시점 내용으로 되돌립니다. 공개 여부는 바뀌지 않습니다.
+  Future<NoticeDetail> revert({
+    required String noticeId,
+    required String revisionId,
+  });
+
+  /// 예약 공개를 겁니다. 초안에만 걸 수 있고 다시 걸면 시각이 바뀝니다.
+  Future<NoticeDetail> schedule({
+    required String noticeId,
+    required DateTime publishAt,
+  });
+
+  Future<NoticeDetail> cancelSchedule(String noticeId);
 }

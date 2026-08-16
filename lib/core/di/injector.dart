@@ -112,6 +112,16 @@ void _registerContent() {
     ..registerLazySingleton(() => CreateNoticeUseCase(getIt<NoticeRepository>()))
     ..registerLazySingleton(() => UpdateNoticeUseCase(getIt<NoticeRepository>()))
     ..registerLazySingleton(() => DeleteNoticeUseCase(getIt<NoticeRepository>()))
+    ..registerLazySingleton(
+      () => GetNoticeRevisionsUseCase(getIt<NoticeRepository>()),
+    )
+    ..registerLazySingleton(() => RevertNoticeUseCase(getIt<NoticeRepository>()))
+    ..registerLazySingleton(
+      () => ScheduleNoticeUseCase(getIt<NoticeRepository>()),
+    )
+    ..registerLazySingleton(
+      () => CancelNoticeScheduleUseCase(getIt<NoticeRepository>()),
+    )
     ..registerLazySingleton<GuideRepository>(
       () => GuideRepositoryImpl(getIt<DioClient>()),
     )

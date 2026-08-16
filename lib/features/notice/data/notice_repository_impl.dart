@@ -90,6 +90,58 @@ class NoticeRepositoryImpl implements NoticeRepository {
   Future<void> deleteNotice(String noticeId) =>
       _guard(() => _client.delete('/notices/$noticeId'));
 
+  @override
+  Future<List<NoticeRevision>> getRevisions(String noticeId) => _guard(
+    () => _client.get(
+      '/notices/$noticeId/revisions',
+      parse: (data) => data is List
+          ? data.whereType<Map<String, dynamic>>().map(_toRevision).toList()
+          : const <NoticeRevision>[],
+    ),
+  );
+
+  @override
+  Future<NoticeDetail> revert({
+    required String noticeId,
+    required String revisionId,
+  }) => _guard(
+    () => _client.post(
+      '/notices/$noticeId/revisions/$revisionId/revert',
+      parse: (data) => _toDetail(_asMap(data)),
+    ),
+  );
+
+  @override
+  Future<NoticeDetail> schedule({
+    required String noticeId,
+    required DateTime publishAt,
+  }) => _guard(
+    () => _client.put(
+      '/notices/$noticeId/schedule',
+      // 서버가 시간대까지 알아야 하므로 UTC 로 바꿔 보낸다.
+      body: {'publishAt': publishAt.toUtc().toIso8601String()},
+      parse: (data) => _toDetail(_asMap(data)),
+    ),
+  );
+
+  @override
+  Future<NoticeDetail> cancelSchedule(String noticeId) => _guard(
+    () => _client.deleteAndParse(
+      '/notices/$noticeId/schedule',
+      parse: (data) => _toDetail(_asMap(data)),
+    ),
+  );
+
+  static NoticeRevision _toRevision(Map<String, dynamic> json) => NoticeRevision(
+    id: json['id'] as String? ?? '',
+    title: json['title'] as String? ?? '',
+    content: json['content'] as String? ?? '',
+    category: NoticeCategory.fromCode(json['category'] as String?),
+    pinned: json['pinned'] as bool? ?? false,
+    editedByEmail: json['editedByEmail'] as String? ?? '',
+    createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '')?.toLocal(),
+  );
+
   static NoticeSummary _toSummary(Map<String, dynamic> json) => NoticeSummary(
     id: json['id'] as String,
     title: json['title'] as String? ?? '',
@@ -113,6 +165,9 @@ class NoticeRepositoryImpl implements NoticeRepository {
     publishedAt: DateTime.tryParse(json['publishedAt'] as String? ?? '')?.toLocal(),
     authorName: json['authorName'] as String?,
     updatedAt: DateTime.tryParse(json['updatedAt'] as String? ?? '')?.toLocal(),
+    scheduledPublishAt: DateTime.tryParse(
+      json['scheduledPublishAt'] as String? ?? '',
+    )?.toLocal(),
   );
 
   static Map<String, dynamic> _asMap(Object? data) {

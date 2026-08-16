@@ -75,3 +75,39 @@ class DeleteNoticeUseCase {
 
   Future<void> call(String noticeId) => _repository.deleteNotice(noticeId);
 }
+
+class GetNoticeRevisionsUseCase {
+  const GetNoticeRevisionsUseCase(this._repository);
+  final NoticeRepository _repository;
+
+  Future<List<NoticeRevision>> call(String noticeId) =>
+      _repository.getRevisions(noticeId);
+}
+
+class RevertNoticeUseCase {
+  const RevertNoticeUseCase(this._repository);
+  final NoticeRepository _repository;
+
+  Future<NoticeDetail> call({
+    required String noticeId,
+    required String revisionId,
+  }) => _repository.revert(noticeId: noticeId, revisionId: revisionId);
+}
+
+class ScheduleNoticeUseCase {
+  const ScheduleNoticeUseCase(this._repository);
+  final NoticeRepository _repository;
+
+  Future<NoticeDetail> call({
+    required String noticeId,
+    required DateTime publishAt,
+  }) => _repository.schedule(noticeId: noticeId, publishAt: publishAt);
+}
+
+class CancelNoticeScheduleUseCase {
+  const CancelNoticeScheduleUseCase(this._repository);
+  final NoticeRepository _repository;
+
+  Future<NoticeDetail> call(String noticeId) =>
+      _repository.cancelSchedule(noticeId);
+}
