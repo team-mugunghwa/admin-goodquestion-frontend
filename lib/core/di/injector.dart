@@ -181,6 +181,9 @@ void _registerOperations() {
       () => DatabaseRepositoryImpl(getIt<DioClient>()),
     )
     ..registerLazySingleton(() => GetTablesUseCase(getIt<DatabaseRepository>()))
+    ..registerLazySingleton(
+      () => GetRelationsUseCase(getIt<DatabaseRepository>()),
+    )
     ..registerLazySingleton(() => GetTableUseCase(getIt<DatabaseRepository>()))
     ..registerLazySingleton(
       () => GetTableRowsUseCase(getIt<DatabaseRepository>()),

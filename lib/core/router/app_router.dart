@@ -9,6 +9,7 @@ import '../../features/auth/presentation/views/login_view.dart';
 import '../../features/auth/presentation/views/my_account_view.dart';
 import '../../features/dashboard/presentation/views/dashboard_view.dart';
 import '../../features/database/presentation/views/database_list_view.dart';
+import '../../features/database/presentation/views/schema_diagram_view.dart';
 import '../../features/database/presentation/views/table_detail_view.dart';
 import '../../features/guide/presentation/views/guide_list_view.dart';
 import '../../features/member/presentation/views/member_detail_view.dart';
@@ -142,6 +143,12 @@ GoRouter createRouter(AdminSession session) {
             path: AppRoutes.database,
             builder: (context, state) => const DatabaseListView(),
             routes: [
+              // 'diagram' 을 :tableName 보다 먼저 등록해야 합니다. 순서가 반대면
+              // /database/diagram 이 tableName="diagram" 으로 잡힙니다.
+              GoRoute(
+                path: 'diagram',
+                builder: (context, state) => const SchemaDiagramView(),
+              ),
               GoRoute(
                 path: ':${AppRoutes.tableNameParam}',
                 builder: (context, state) => TableDetailView(
