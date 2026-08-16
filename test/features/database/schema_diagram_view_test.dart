@@ -120,4 +120,21 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('마이그레이션 이력'), findsOneWidget);
   });
+
+  testWidgets('전부 숨겨져도 필터 바가 남아 되돌릴 수 있다', (tester) async {
+    await pumpDiagram(tester);
+
+    // 고립 테이블만 있는 분류로 좁힌 뒤 숨기면 화면에 남는 상자가 없다.
+    await tester.tap(find.text('시스템'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('관계 없는 테이블 숨기기'));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('보여 줄 테이블이 없습니다'), findsOneWidget);
+
+    // 여기서 토글이 사라지면 되돌릴 방법이 없다. 실제로 그런 함정이 있었다.
+    await tester.tap(find.text('관계 없는 테이블 숨기기'));
+    await tester.pumpAndSettle();
+    expect(find.text('마이그레이션 이력'), findsOneWidget);
+  });
 }

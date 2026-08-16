@@ -117,7 +117,9 @@ class _SchemaDiagramBodyState extends State<_SchemaDiagramBody> {
         state: vm.state,
         errorMessage: vm.errorMessage,
         onRetry: () => context.read<SchemaDiagramViewModel>().load(),
-        isEmpty: vm.layout.isEmpty,
+        // 그래프 자체가 비었을 때만 빈 화면입니다. 필터로 다 숨겨진 경우까지
+        // 빈 화면으로 바꾸면 필터 바가 함께 사라져서 토글을 되돌릴 수 없습니다.
+        isEmpty: vm.graph.isEmpty,
         emptyTitle: '그릴 관계가 없습니다',
         builder: (context) {
           _fitOnce(vm.layout);
@@ -259,6 +261,21 @@ class _Canvas extends StatelessWidget {
   }
 
   Widget _canvas(BuildContext context, DiagramLayout layout) {
+    // 필터로 전부 숨겨진 경우. 빈 캔버스만 두면 고장으로 보입니다.
+    if (layout.isEmpty) {
+      return Container(
+        decoration: BoxDecoration(
+          color: AppColors.canvas,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          border: Border.all(color: AppColors.ink100),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          '지금 조건에서는 보여 줄 테이블이 없습니다. 위 필터를 조정해 보세요.',
+          style: AppTypography.caption,
+        ),
+      );
+    }
     return Container(
       decoration: BoxDecoration(
         color: AppColors.canvas,
