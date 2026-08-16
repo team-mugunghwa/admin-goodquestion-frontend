@@ -24,6 +24,18 @@ DbSchemaGraph _wideGraph() {
         ],
       ),
   ];
+  tables.add(
+    const DbTableNode(
+      name: 'flyway_schema_history',
+      comment: '마이그레이션 이력',
+      group: '시스템',
+      columnCount: 4,
+      containsPersonalData: false,
+      keyColumns: [
+        DbKeyColumn(name: 'installed_rank', primaryKey: true, foreignKey: false),
+      ],
+    ),
+  );
   return DbSchemaGraph(
     tables: tables,
     relations: [
@@ -88,5 +100,24 @@ void main() {
 
     expect(find.textContaining('table_0'), findsWidgets);
     expect(_scaleOf(tester), before);
+  });
+
+  testWidgets('숨기기 토글을 누르면 관계 없는 상자가 사라진다', (tester) async {
+    await pumpDiagram(tester);
+
+    // 고립 테이블까지 전부 보이는 상태에서 시작한다.
+    expect(find.text('마이그레이션 이력'), findsOneWidget);
+
+    await tester.tap(find.text('관계 없는 테이블 숨기기'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('마이그레이션 이력'), findsNothing);
+    // 몇 개를 숨겼는지도 보여야 한다. 말없이 빼면 화면을 의심하게 된다.
+    expect(find.textContaining('1개를 숨겼습니다'), findsOneWidget);
+
+    // 다시 누르면 돌아온다.
+    await tester.tap(find.text('관계 없는 테이블 숨기기'));
+    await tester.pumpAndSettle();
+    expect(find.text('마이그레이션 이력'), findsOneWidget);
   });
 }

@@ -249,4 +249,90 @@ void main() {
           SchemaLayout.borderWidth * 2,
     );
   });
+
+  test('숨기기를 켜면 관계 없는 테이블이 빠지고 개수가 남는다', () {
+    final layout = SchemaLayout.compute(
+      DbSchemaGraph(
+        tables: [
+          _node('parents'),
+          _node('children'),
+          // 마이그레이션 이력처럼 어디와도 이어지지 않는 테이블들.
+          _node('flyway_schema_history', group: '시스템'),
+          _node('guides', group: '콘텐츠'),
+        ],
+        relations: [_relation('children', 'parents')],
+      ),
+      hideIsolated: true,
+    );
+
+    expect(layout.tables.map((t) => t.name), ['parents', 'children']);
+    expect(layout.hiddenIsolatedCount, 2);
+  });
+
+  test('자기 자신만 가리키는 테이블도 숨긴다', () {
+    // 관계 목록에는 있지만 선은 그려지지 않아서, 남겨 두면 여전히 외딴 상자다.
+    final layout = SchemaLayout.compute(
+      DbSchemaGraph(
+        tables: [_node('parents'), _node('children'), _node('categories')],
+        relations: [
+          _relation('children', 'parents'),
+          _relation('categories', 'categories'),
+        ],
+      ),
+      hideIsolated: true,
+    );
+
+    expect(layout.tables.map((t) => t.name), isNot(contains('categories')));
+    expect(layout.hiddenIsolatedCount, 1);
+  });
+
+  test('숨기기를 꺼 두면 지금까지와 같다', () {
+    final graph = DbSchemaGraph(
+      tables: [_node('parents'), _node('flyway_schema_history', group: '시스템')],
+      relations: const [],
+    );
+
+    final layout = SchemaLayout.compute(graph);
+    expect(layout.tables, hasLength(2));
+    expect(layout.hiddenIsolatedCount, 0);
+  });
+
+  test('분류를 고른 상태에서도 숨기기가 함께 동작한다', () {
+    final layout = SchemaLayout.compute(
+      DbSchemaGraph(
+        tables: [
+          _node('parents'),
+          _node('children'),
+          _node('story_sessions', group: '진행 기록'),
+          // 같은 분류지만 관계가 없는 테이블.
+          _node('word_practices', group: '진행 기록'),
+        ],
+        relations: [
+          _relation('children', 'parents'),
+          _relation('story_sessions', 'children'),
+        ],
+      ),
+      group: '진행 기록',
+      hideIsolated: true,
+    );
+
+    final names = layout.tables.map((t) => t.name).toList();
+    expect(names, containsAll(['story_sessions', 'children']));
+    expect(names, isNot(contains('word_practices')));
+    expect(layout.hiddenIsolatedCount, 1);
+  });
+
+  test('전부 숨겨져도 숨긴 개수는 알려 준다', () {
+    // 빈 화면만 남으면 고장으로 보인다.
+    final layout = SchemaLayout.compute(
+      DbSchemaGraph(
+        tables: [_node('a'), _node('b')],
+        relations: const [],
+      ),
+      hideIsolated: true,
+    );
+
+    expect(layout.isEmpty, isTrue);
+    expect(layout.hiddenIsolatedCount, 2);
+  });
 }
