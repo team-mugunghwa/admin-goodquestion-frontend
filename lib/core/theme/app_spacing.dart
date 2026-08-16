@@ -39,14 +39,14 @@ abstract final class AppSizes {
   /// 상단 바 높이.
   static const double topBarHeight = 64;
 
-  /// 최소 터치·클릭 타겟.
+  /// 최소 터치/클릭 타겟.
   static const double tapTarget = 40;
 
   /// 표 한 행의 높이. 너무 좁으면 스캔이 어렵고 너무 넓으면 한 화면에 덜 들어옵니다.
   static const double tableRowHeight = 52;
 
   /// 본문 콘텐츠 최대 폭. 편집 폼처럼 한 줄이 길면 읽기 힘든 화면에 씁니다.
-  /// 표는 이 제한을 받지 않습니다 — 열이 많으면 넓을수록 좋습니다.
+  /// 표는 이 제한을 받지 않습니다 - 열이 많으면 넓을수록 좋습니다.
   static const double formMaxWidth = 720;
 
   /// 아이콘.

@@ -2,9 +2,9 @@ import '../../../../core/domain/content_status.dart';
 
 enum GuideCategory {
   basic('BASIC', '서비스 소개'),
-  account('ACCOUNT', '계정·아이 프로필'),
+  account('ACCOUNT', '계정/아이 프로필'),
   play('PLAY', '이야기 진행'),
-  reward('REWARD', '별가루·행성'),
+  reward('REWARD', '별가루/행성'),
   trouble('TROUBLE', '문제 해결');
 
   const GuideCategory(this.code, this.label);

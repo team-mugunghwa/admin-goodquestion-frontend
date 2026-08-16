@@ -28,7 +28,7 @@ class ServerException extends AppException {
   final int? statusCode;
 }
 
-/// 연결 실패·타임아웃 등 네트워크 자체의 문제.
+/// 연결 실패/타임아웃 등 네트워크 자체의 문제.
 class NetworkException extends AppException {
   const NetworkException([super.message = '네트워크에 연결할 수 없습니다.']);
 }

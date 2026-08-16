@@ -45,7 +45,7 @@ class AdminSummaryDto {
   );
 }
 
-/// 로그인·재발급 응답.
+/// 로그인/재발급 응답.
 class TokenDto {
   const TokenDto({
     required this.accessToken,

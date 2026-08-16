@@ -7,7 +7,7 @@ import '../state/view_state.dart';
 ///
 /// ## 규칙
 /// - `package:flutter/material.dart` 를 import 하지 않습니다. (`foundation.dart` 만)
-/// - **`BuildContext` 를 필드로 갖지 않습니다.** 화면 이동·스낵바가 필요하면
+/// - **`BuildContext` 를 필드로 갖지 않습니다.** 화면 이동/스낵바가 필요하면
 ///   ViewModel 은 상태만 바꾸고 View 가 반응하게 하세요. 그래야 단위 테스트가 됩니다.
 /// - DTO 를 들고 있지 않습니다. domain Entity 만 보관합니다.
 abstract class BaseViewModel extends ChangeNotifier {
@@ -54,7 +54,7 @@ abstract class BaseViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 화면 전체를 채우는 조회. 로딩 → 실행 → 성공/실패.
+  /// 화면 전체를 채우는 조회. 로딩 -> 실행 -> 성공/실패.
   @protected
   Future<void> guard(Future<void> Function() action) async {
     setLoading();
@@ -66,7 +66,7 @@ abstract class BaseViewModel extends ChangeNotifier {
     }
   }
 
-  /// 이미 그려진 화면 위에서 도는 조작(저장·삭제·상태 변경).
+  /// 이미 그려진 화면 위에서 도는 조작(저장/삭제/상태 변경).
   ///
   /// 화면을 스피너로 덮지 않고 [isBusy] 만 올립니다. 실패하면 [errorMessage] 에
   /// 담고 `false` 를 돌려주므로, View 는 그 값으로 스낵바를 띄우면 됩니다.

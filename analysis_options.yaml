@@ -4,7 +4,7 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
   errors:
-    # 규칙 위반을 경고가 아니라 에러로 승격 — 쌓이기 전에 잡습니다
+    # 규칙 위반을 경고가 아니라 에러로 승격 - 쌓이기 전에 잡습니다
     always_declare_return_types: error
     avoid_print: error
     prefer_const_constructors: warning

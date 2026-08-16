@@ -29,7 +29,7 @@ class AppColumn<T> {
 /// 목록 표.
 ///
 /// Flutter 의 `DataTable` 을 쓰지 않습니다. 그쪽은 열 폭이 내용에 따라 정해져서
-/// 페이지를 넘길 때마다 열 경계가 흔들립니다 — 같은 표를 여러 페이지에 걸쳐 훑는
+/// 페이지를 넘길 때마다 열 경계가 흔들립니다 - 같은 표를 여러 페이지에 걸쳐 훑는
 /// 관리자 화면에서는 그 흔들림이 계속 눈에 걸립니다. 여기서는 [AppColumn.flex] 로
 /// 폭을 고정합니다.
 class AppDataTable<T> extends StatelessWidget {

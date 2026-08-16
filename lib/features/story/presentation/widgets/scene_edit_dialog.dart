@@ -319,9 +319,9 @@ String sceneSubtitle(StoryScene scene) {
   final elements = scene.requiredElements
       .map((code) => _thinkingElements[code] ?? code)
       .join(', ');
-  return '${scene.characterName ?? "캐릭터 없음"} · '
+  return '${scene.characterName ?? "캐릭터 없음"} / '
       '${scene.preferredTurns ?? "-"}~${scene.maxTurns ?? "-"}턴'
-      '${elements.isEmpty ? "" : " · $elements"}';
+      '${elements.isEmpty ? "" : " / $elements"}';
 }
 
 /// 장면 목록에서 유형을 구분하는 배지 색.

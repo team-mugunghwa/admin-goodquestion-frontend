@@ -13,22 +13,22 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
 
-  # 상태관리 — ViewModel(ChangeNotifier) 을 위젯 트리에 붙입니다
+  # 상태관리 - ViewModel(ChangeNotifier) 을 위젯 트리에 붙입니다
   provider: ^6.1.2
 
-  # DI — Repository / UseCase / DataSource 등 위젯과 무관한 객체
+  # DI - Repository / UseCase / DataSource 등 위젯과 무관한 객체
   get_it: ^8.0.3
 
-  # 라우팅 — 경로를 lib/core/router/ 한 곳에 선언합니다
+  # 라우팅 - 경로를 lib/core/router/ 한 곳에 선언합니다
   go_router: ^17.4.0
 
-  # HTTP — 인터셉터로 토큰·에러·로깅을 한 곳에서 처리
+  # HTTP - 인터셉터로 토큰/에러/로깅을 한 곳에서 처리
   dio: ^5.7.0
 
   # 관리자 토큰 저장. 웹에서는 브라우저 저장소를 씁니다
   flutter_secure_storage: ^10.0.0
 
-  # 날짜·숫자 표기. 관리자 화면은 표가 많아 자릿수 구분과 상대 시간이 자주 필요합니다
+  # 날짜/숫자 표기. 관리자 화면은 표가 많아 자릿수 구분과 상대 시간이 자주 필요합니다
   intl: ^0.20.2
 
   cupertino_icons: ^1.0.8

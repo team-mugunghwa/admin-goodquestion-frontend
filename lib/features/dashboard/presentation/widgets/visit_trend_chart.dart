@@ -8,7 +8,7 @@ import '../../domain/entities/dashboard_summary.dart';
 /// 방문자 추이 막대 그래프.
 ///
 /// **차트 라이브러리를 넣지 않았습니다.** 필요한 것은 막대 14개와 값 하나뿐인데,
-/// 차트 패키지는 축·범례·애니메이션·인터랙션을 함께 가져오고 웹 번들이 그만큼
+/// 차트 패키지는 축/범례/애니메이션/인터랙션을 함께 가져오고 웹 번들이 그만큼
 /// 커집니다. 이 정도는 `Column` 과 `Container` 로 충분합니다.
 class VisitTrendChart extends StatelessWidget {
   const VisitTrendChart({required this.points, super.key});
@@ -64,7 +64,7 @@ class _Bar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Tooltip(
-      message: '${point.date.month}월 ${point.date.day}일 · ${point.value}명',
+      message: '${point.date.month}월 ${point.date.day}일 / ${point.value}명',
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [

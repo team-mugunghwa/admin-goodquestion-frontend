@@ -207,7 +207,7 @@ class _StoryEditBodyState extends State<_StoryEditBody>
       backRoute: AppRoutes.stories,
       description: vm.isNew
           ? '먼저 이야기를 저장한 뒤 장면과 캐릭터를 추가할 수 있습니다.'
-          : '장면 ${vm.scenes.length}개 · 진행 기록 ${vm.story?.sessionCount ?? 0}건',
+          : '장면 ${vm.scenes.length}개 / 진행 기록 ${vm.story?.sessionCount ?? 0}건',
       scrollable: false,
       actions: [
         FilledButton(
@@ -652,7 +652,7 @@ class _CharacterCard extends StatelessWidget {
           ),
           Text(
             '키: ${character.characterKey}'
-            '${character.ttsVoice == null ? "" : " · 보이스: ${character.ttsVoice}"}',
+            '${character.ttsVoice == null ? "" : " / 보이스: ${character.ttsVoice}"}',
             style: AppTypography.caption,
           ),
           const SizedBox(height: AppSpacing.sm),
