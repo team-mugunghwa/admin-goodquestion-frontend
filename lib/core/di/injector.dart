@@ -174,6 +174,22 @@ void _registerOperations() {
     ..registerLazySingleton(
       () => ReopenInquiryUseCase(getIt<SupportRepository>()),
     )
+    ..registerLazySingleton(() => AssignInquiryUseCase(getIt<SupportRepository>()))
+    ..registerLazySingleton(
+      () => UnassignInquiryUseCase(getIt<SupportRepository>()),
+    )
+    ..registerLazySingleton(
+      () => AddInquiryNoteUseCase(getIt<SupportRepository>()),
+    )
+    ..registerLazySingleton(
+      () => GetReplyTemplatesUseCase(getIt<SupportRepository>()),
+    )
+    ..registerLazySingleton(
+      () => SaveReplyTemplateUseCase(getIt<SupportRepository>()),
+    )
+    ..registerLazySingleton(
+      () => DeleteReplyTemplateUseCase(getIt<SupportRepository>()),
+    )
     ..registerLazySingleton<AuditLogRepository>(
       () => AuditLogRepositoryImpl(getIt<DioClient>()),
     )

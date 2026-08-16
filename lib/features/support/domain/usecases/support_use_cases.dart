@@ -66,3 +66,50 @@ class ReopenInquiryUseCase {
 
   Future<void> call(String inquiryId) => _repository.reopen(inquiryId);
 }
+
+class AssignInquiryUseCase {
+  const AssignInquiryUseCase(this._repository);
+  final SupportRepository _repository;
+
+  Future<void> call(String inquiryId) => _repository.assignToMe(inquiryId);
+}
+
+class UnassignInquiryUseCase {
+  const UnassignInquiryUseCase(this._repository);
+  final SupportRepository _repository;
+
+  Future<void> call(String inquiryId) => _repository.unassign(inquiryId);
+}
+
+class AddInquiryNoteUseCase {
+  const AddInquiryNoteUseCase(this._repository);
+  final SupportRepository _repository;
+
+  Future<InquiryNote> call({required String inquiryId, required String body}) =>
+      _repository.addNote(inquiryId: inquiryId, body: body);
+}
+
+class GetReplyTemplatesUseCase {
+  const GetReplyTemplatesUseCase(this._repository);
+  final SupportRepository _repository;
+
+  Future<List<ReplyTemplate>> call() => _repository.getTemplates();
+}
+
+class SaveReplyTemplateUseCase {
+  const SaveReplyTemplateUseCase(this._repository);
+  final SupportRepository _repository;
+
+  Future<ReplyTemplate> call({
+    String? id,
+    required String title,
+    required String body,
+  }) => _repository.saveTemplate(id: id, title: title, body: body);
+}
+
+class DeleteReplyTemplateUseCase {
+  const DeleteReplyTemplateUseCase(this._repository);
+  final SupportRepository _repository;
+
+  Future<void> call(String id) => _repository.deleteTemplate(id);
+}
