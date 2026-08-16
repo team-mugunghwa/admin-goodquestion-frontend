@@ -13,6 +13,7 @@ import '../../../../core/widgets/app_page.dart';
 import '../../../../core/widgets/app_state_views.dart';
 import '../../domain/usecases/database_use_cases.dart';
 import '../diagram/relation_painter.dart';
+import '../diagram/schema_layout.dart';
 import '../diagram/table_box.dart';
 import '../viewmodels/schema_diagram_view_model.dart';
 
@@ -43,13 +44,57 @@ class _SchemaDiagramBody extends StatefulWidget {
 class _SchemaDiagramBodyState extends State<_SchemaDiagramBody> {
   final TransformationController _transform = TransformationController();
 
+  Size? _viewport;
+
+  /// 이 배치를 이미 화면에 맞춰 봤는지. 분류를 바꾸면 다시 맞춥니다.
+  Object? _fittedLayout;
+
   @override
   void dispose() {
     _transform.dispose();
     super.dispose();
   }
 
-  void _resetView() => _transform.value = Matrix4.identity();
+  /// 관계도 전체가 보이도록 축소하고 가운데에 놓습니다.
+  ///
+  /// 100% 로 되돌리기만 하면 39개 테이블에서는 왼쪽 위 구석만 보입니다. 처음
+  /// 열었을 때 필요한 것은 "전체가 어떻게 생겼는가"이고, 확대는 그다음입니다.
+  void _fitToViewport() {
+    final viewport = _viewport;
+    final layout = context.read<SchemaDiagramViewModel>().layout;
+    if (viewport == null || layout.isEmpty) return;
+
+    final scale = [
+      viewport.width / layout.size.width,
+      viewport.height / layout.size.height,
+      // 작은 관계도를 억지로 키우지는 않습니다. 글자만 뭉개집니다.
+      1.0,
+    ].reduce((a, b) => a < b ? a : b);
+
+    _transform.value = Matrix4.identity()
+      ..translateByDouble(
+        (viewport.width - layout.size.width * scale) / 2,
+        (viewport.height - layout.size.height * scale) / 2,
+        0,
+        1,
+      )
+      ..scaleByDouble(scale, scale, scale, 1);
+  }
+
+  /// 화면 크기만 기억해 둡니다. **여기서 다시 맞추지 않습니다.**
+  ///
+  /// 상자를 누르면 아래에 설명 칸이 생기면서 캔버스가 낮아지는데, 그때마다 다시
+  /// 맞추면 상자 하나 눌렀을 뿐인데 관계도 전체가 확대/축소되어 보던 자리를 잃습니다.
+  void _onViewportChanged(Size size) => _viewport = size;
+
+  /// 배치가 새로 나왔으면 한 번만 맞춥니다. 그 뒤 확대해 둔 자리는 건드리지 않습니다.
+  void _fitOnce(Object layoutKey) {
+    if (_fittedLayout == layoutKey) return;
+    _fittedLayout = layoutKey;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _fitToViewport();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +108,7 @@ class _SchemaDiagramBodyState extends State<_SchemaDiagramBody> {
       scrollable: false,
       actions: [
         TextButton.icon(
-          onPressed: _resetView,
+          onPressed: _fitToViewport,
           icon: const Icon(AppIcons.refresh, size: AppSizes.icon),
           label: const Text('화면 맞춤'),
         ),
@@ -74,34 +119,40 @@ class _SchemaDiagramBodyState extends State<_SchemaDiagramBody> {
         onRetry: () => context.read<SchemaDiagramViewModel>().load(),
         isEmpty: vm.layout.isEmpty,
         emptyTitle: '그릴 관계가 없습니다',
-        builder: (context) => Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _GroupFilter(viewModel: vm, onChanged: _resetView),
-            Expanded(child: _Canvas(viewModel: vm, transform: _transform)),
-            if (vm.focusedNode != null) _FocusPanel(viewModel: vm),
-            const _Legend(),
-          ],
-        ),
+        builder: (context) {
+          _fitOnce(vm.layout);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _GroupFilter(viewModel: vm),
+              Expanded(
+                child: _Canvas(
+                  viewModel: vm,
+                  transform: _transform,
+                  onViewportChanged: _onViewportChanged,
+                ),
+              ),
+              if (vm.focusedNode != null) _FocusPanel(viewModel: vm),
+              const _Legend(),
+            ],
+          );
+        },
       ),
     );
   }
 }
 
 class _GroupFilter extends StatelessWidget {
-  const _GroupFilter({required this.viewModel, required this.onChanged});
+  const _GroupFilter({required this.viewModel});
 
   final SchemaDiagramViewModel viewModel;
-  final VoidCallback onChanged;
 
   @override
   Widget build(BuildContext context) {
-    void select(String? group) {
-      context.read<SchemaDiagramViewModel>().selectGroup(group);
-      // 보이는 상자가 달라지면 배치도 달라집니다. 확대해 둔 자리를 그대로 두면
-      // 엉뚱한 빈 곳을 보게 됩니다.
-      onChanged();
-    }
+    // 분류를 바꾸면 배치가 달라지고, 화면은 새 배치에 맞춰 다시 맞춰집니다.
+    // 확대해 둔 자리를 그대로 두면 엉뚱한 빈 곳을 보게 됩니다.
+    void select(String? group) =>
+        context.read<SchemaDiagramViewModel>().selectGroup(group);
 
     return AppFilterBar(
       children: [
@@ -157,15 +208,29 @@ class _GroupChip extends StatelessWidget {
 }
 
 class _Canvas extends StatelessWidget {
-  const _Canvas({required this.viewModel, required this.transform});
+  const _Canvas({
+    required this.viewModel,
+    required this.transform,
+    required this.onViewportChanged,
+  });
 
   final SchemaDiagramViewModel viewModel;
   final TransformationController transform;
+  final ValueChanged<Size> onViewportChanged;
 
   @override
   Widget build(BuildContext context) {
     final layout = viewModel.layout;
 
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        onViewportChanged(constraints.biggest);
+        return _canvas(context, layout);
+      },
+    );
+  }
+
+  Widget _canvas(BuildContext context, DiagramLayout layout) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.canvas,
