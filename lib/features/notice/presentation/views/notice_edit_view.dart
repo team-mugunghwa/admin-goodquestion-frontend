@@ -33,6 +33,10 @@ class NoticeEditView extends StatelessWidget {
         getNotice: getIt<GetNoticeUseCase>(),
         createNotice: getIt<CreateNoticeUseCase>(),
         updateNotice: getIt<UpdateNoticeUseCase>(),
+        getRevisions: getIt<GetNoticeRevisionsUseCase>(),
+        revertNotice: getIt<RevertNoticeUseCase>(),
+        scheduleNotice: getIt<ScheduleNoticeUseCase>(),
+        cancelSchedule: getIt<CancelNoticeScheduleUseCase>(),
         noticeId: noticeId,
       )..load(),
       child: const _NoticeEditBody(),
@@ -52,9 +56,10 @@ class _NoticeEditBodyState extends State<_NoticeEditBody> {
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
 
-  /// 서버에서 받아온 값을 폼에 한 번만 채웁니다. 매 build 마다 채우면
-  /// 타이핑하는 족족 되돌아갑니다.
-  bool _filled = false;
+  /// 마지막으로 폼을 채운 원본. 매 build 마다 채우면 타이핑하는 족족
+  /// 되돌아가므로, 서버 내용이 실제로 달라졌을 때만 다시 채웁니다.
+  /// 되돌리기가 그 경우다 - 채우지 않으면 입력칸이 예전 내용에 머문다.
+  NoticeDetail? _filledFrom;
 
   @override
   void dispose() {
@@ -92,11 +97,15 @@ class _NoticeEditBodyState extends State<_NoticeEditBody> {
   Widget build(BuildContext context) {
     final vm = context.watch<NoticeEditViewModel>();
 
-    if (!_filled && vm.notice != null) {
-      _titleController.text = vm.notice!.title;
-      _contentController.text = vm.notice!.content;
-      _filled = true;
+    final loaded = vm.notice;
+    if (loaded != null &&
+        (_filledFrom == null ||
+            _filledFrom!.title != loaded.title ||
+            _filledFrom!.content != loaded.content)) {
+      _titleController.text = loaded.title;
+      _contentController.text = loaded.content;
     }
+    if (loaded != null) _filledFrom = loaded;
 
     return AppPage(
       title: vm.isNew ? '공지 작성' : '공지 수정',
@@ -106,6 +115,23 @@ class _NoticeEditBodyState extends State<_NoticeEditBody> {
           : '조회 ${Formats.count(vm.notice!.viewCount)}회 / '
                 '마지막 수정 ${Formats.dateTime(vm.notice!.updatedAt)}',
       actions: [
+        // 저장 전에 사용자 화면 모습을 확인한다. 실수 비용이 큰 화면이라
+        // "보내기 전에 본다"가 이 화면의 기본 동선이어야 한다.
+        OutlinedButton(
+          onPressed: () => _NoticePreviewDialog.show(
+            context,
+            title: _titleController.text,
+            content: _contentController.text,
+            category: vm.category,
+            pinned: vm.pinned,
+          ),
+          child: const Text('미리보기'),
+        ),
+        if (!vm.isNew)
+          OutlinedButton(
+            onPressed: () => _RevisionsDialog.show(context),
+            child: const Text('수정 이력'),
+          ),
         OutlinedButton(
           onPressed: () => context.go(AppRoutes.notices),
           child: const Text('취소'),
@@ -237,6 +263,10 @@ class _NoticeEditBodyState extends State<_NoticeEditBody> {
                           ),
                         ),
                       ),
+                    if (!vm.isNew && vm.status == ContentStatus.draft) ...[
+                      const SizedBox(height: AppSpacing.lg),
+                      const _ScheduleControl(),
+                    ],
                   ],
                 ),
               ),
@@ -244,6 +274,320 @@ class _NoticeEditBodyState extends State<_NoticeEditBody> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// 사용자 앱에서 보이는 모습.
+///
+/// 사용자 앱의 공지 화면과 같은 구성(분류, 고정 표시, 제목, 본문, 줄바꿈 유지)을
+/// 흰 카드에 재현합니다. 완전히 같은 렌더링은 아니지만, 잡으려는 실수는
+/// 줄바꿈 꼬임/제목 오타/분류 잘못 같은 것이라 이 수준이면 잡힙니다.
+class _NoticePreviewDialog extends StatelessWidget {
+  const _NoticePreviewDialog({
+    required this.title,
+    required this.content,
+    required this.category,
+    required this.pinned,
+  });
+
+  final String title;
+  final String content;
+  final NoticeCategory category;
+  final bool pinned;
+
+  static Future<void> show(
+    BuildContext context, {
+    required String title,
+    required String content,
+    required NoticeCategory category,
+    required bool pinned,
+  }) => showDialog<void>(
+    context: context,
+    builder: (_) => _NoticePreviewDialog(
+      title: title,
+      content: content,
+      category: category,
+      pinned: pinned,
+    ),
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('미리보기'),
+      content: SizedBox(
+        width: 420,
+        child: SingleChildScrollView(
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              border: Border.all(color: AppColors.ink100),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primarySurface,
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
+                      ),
+                      child: Text(
+                        category.label,
+                        style: AppTypography.badge.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                    if (pinned) ...[
+                      const SizedBox(width: AppSpacing.sm),
+                      Text(
+                        '고정됨',
+                        style: AppTypography.badge.copyWith(
+                          color: AppColors.warning,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  title.trim().isEmpty ? '(제목 없음)' : title,
+                  style: AppTypography.sectionTitle,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  Formats.date(DateTime.now()),
+                  style: AppTypography.caption,
+                ),
+                const Divider(height: AppSpacing.xl),
+                Text(
+                  content.trim().isEmpty ? '(본문 없음)' : content,
+                  style: AppTypography.body,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+      actions: [
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('닫기'),
+        ),
+      ],
+    );
+  }
+}
+
+/// 예약 공개 조작. 초안인 기존 공지에서만 보입니다.
+class _ScheduleControl extends StatelessWidget {
+  const _ScheduleControl();
+
+  Future<void> _pick(BuildContext context) async {
+    final vm = context.read<NoticeEditViewModel>();
+    final now = DateTime.now();
+
+    final date = await showDatePicker(
+      context: context,
+      initialDate: now.add(const Duration(days: 1)),
+      firstDate: now,
+      lastDate: now.add(const Duration(days: 365)),
+    );
+    if (date == null || !context.mounted) return;
+
+    final time = await showTimePicker(
+      context: context,
+      initialTime: const TimeOfDay(hour: 10, minute: 0),
+    );
+    if (time == null || !context.mounted) return;
+
+    final at = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+    if (!at.isAfter(DateTime.now())) {
+      showResultSnackBar(context, success: false, message: '앞으로의 시각을 골라 주세요.');
+      return;
+    }
+
+    final ok = await vm.schedule(at);
+    if (!context.mounted) return;
+    showResultSnackBar(
+      context,
+      success: ok,
+      message: ok
+          ? '${Formats.dateTime(at)} 에 공개되도록 예약했습니다.'
+          : (vm.errorMessage ?? '예약하지 못했습니다.'),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.watch<NoticeEditViewModel>();
+    final scheduledAt = vm.notice?.scheduledPublishAt;
+
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              scheduledAt == null
+                  ? '예약 공개: 정해 둔 시각에 자동으로 공개됩니다. 밤 12시 공개를 위해 밤에 접속하지 않아도 됩니다.'
+                  : '${Formats.dateTime(scheduledAt)} 에 자동 공개됩니다.',
+              style: AppTypography.caption.copyWith(
+                color: scheduledAt == null ? AppColors.ink500 : AppColors.primary,
+                fontWeight:
+                    scheduledAt == null ? FontWeight.w400 : FontWeight.w600,
+              ),
+            ),
+          ),
+          if (scheduledAt == null)
+            OutlinedButton(
+              onPressed: vm.isBusy ? null : () => _pick(context),
+              child: const Text('예약 걸기'),
+            )
+          else ...[
+            TextButton(
+              onPressed: vm.isBusy ? null : () => _pick(context),
+              child: const Text('시각 바꾸기'),
+            ),
+            TextButton(
+              onPressed: vm.isBusy
+                  ? null
+                  : () async {
+                      final vmRead = context.read<NoticeEditViewModel>();
+                      final ok = await vmRead.cancelSchedule();
+                      if (!context.mounted) return;
+                      showResultSnackBar(
+                        context,
+                        success: ok,
+                        message: ok
+                            ? '예약을 취소했습니다.'
+                            : (vmRead.errorMessage ?? '취소하지 못했습니다.'),
+                      );
+                    },
+              child: const Text('예약 취소'),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// 수정 이력. 최신이 위이고, 항목을 펼쳐 그 시점 본문을 보고 되돌립니다.
+class _RevisionsDialog extends StatelessWidget {
+  const _RevisionsDialog({required this.viewModel});
+
+  final NoticeEditViewModel viewModel;
+
+  static Future<void> show(BuildContext context) {
+    final vm = context.read<NoticeEditViewModel>();
+    return showDialog<void>(
+      context: context,
+      builder: (_) => _RevisionsDialog(viewModel: vm),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('수정 이력'),
+      content: SizedBox(
+        width: 560,
+        child: FutureBuilder<List<NoticeRevision>>(
+          future: viewModel.loadRevisions(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const SizedBox(
+                height: 120,
+                child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+              );
+            }
+            final revisions = snapshot.data ?? const <NoticeRevision>[];
+            if (revisions.isEmpty) {
+              return Text(
+                '아직 이력이 없습니다. 내용을 고쳐 저장하면 바꾸기 전 내용이 여기 남습니다.',
+                style: AppTypography.caption,
+              );
+            }
+            return SizedBox(
+              height: 400,
+              child: ListView.builder(
+                itemCount: revisions.length,
+                itemBuilder: (context, index) {
+                  final revision = revisions[index];
+                  return ExpansionTile(
+                    tilePadding: EdgeInsets.zero,
+                    title: Text(revision.title, style: AppTypography.body),
+                    subtitle: Text(
+                      '${revision.editedByEmail} / ${Formats.dateTime(revision.createdAt)}',
+                      style: AppTypography.caption,
+                    ),
+                    children: [
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          child: Text(
+                            revision.content,
+                            style: AppTypography.body,
+                          ),
+                        ),
+                      ),
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () async {
+                            final confirmed = await showConfirmDialog(
+                              context,
+                              title: '이 내용으로 되돌릴까요?',
+                              message:
+                                  '지금 내용도 이력으로 남아 다시 돌아올 수 있습니다. 공개 여부는 바뀌지 않습니다.',
+                              confirmLabel: '되돌리기',
+                            );
+                            if (!confirmed || !context.mounted) return;
+                            final reverted =
+                                await viewModel.revert(revision.id);
+                            if (!context.mounted) return;
+                            Navigator.of(context).pop();
+                            showResultSnackBar(
+                              context,
+                              success: reverted != null,
+                              message: reverted != null
+                                  ? '되돌렸습니다. 저장 없이 바로 반영되어 있습니다.'
+                                  : (viewModel.errorMessage ?? '되돌리지 못했습니다.'),
+                            );
+                          },
+                          child: const Text('이 내용으로 되돌리기'),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            );
+          },
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('닫기'),
+        ),
+      ],
     );
   }
 }
