@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants/app_icons.dart';
 import '../../../../core/router/app_routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -129,6 +130,8 @@ class ColumnList extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
+        _ReferencedByCard(references: detail.referencedBy),
+        const SizedBox(height: AppSpacing.lg),
         _IndexCard(indexes: detail.indexes),
       ],
     );
@@ -139,6 +142,62 @@ class ColumnList extends StatelessWidget {
     if (value == null) return '-';
     if (value.length <= 28) return value;
     return '${value.substring(0, 28)}...';
+  }
+}
+
+/// 이 테이블을 가리키는 곳.
+///
+/// 컬럼의 외래키는 "내가 어디를 보는가"만 알려 줍니다. 값을 지워도 되는지,
+/// 이 테이블이 어디에 쓰이는지 알려면 반대 방향이 필요합니다.
+class _ReferencedByCard extends StatelessWidget {
+  const _ReferencedByCard({required this.references});
+
+  final List<DbIncomingReference> references;
+
+  @override
+  Widget build(BuildContext context) {
+    if (references.isEmpty) {
+      return AppCard(
+        title: '이 테이블을 가리키는 곳',
+        child: Text('없습니다. 다른 테이블이 이 테이블을 참조하지 않습니다.',
+            style: AppTypography.caption),
+      );
+    }
+    return AppCard(
+      title: '이 테이블을 가리키는 곳 (${references.length})',
+      trailing: TextButton.icon(
+        onPressed: () => context.go(AppRoutes.dbDiagram),
+        icon: const Icon(AppIcons.diagram, size: AppSizes.icon),
+        label: const Text('관계도에서 보기'),
+      ),
+      child: Wrap(
+        spacing: AppSpacing.sm,
+        runSpacing: AppSpacing.sm,
+        children: [
+          for (final reference in references)
+            InkWell(
+              onTap: () => context.go(AppRoutes.dbTableOf(reference.table)),
+              borderRadius: BorderRadius.circular(AppRadius.sm),
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.xs,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceMuted,
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                ),
+                child: Text(
+                  '${reference.table}.${reference.column}',
+                  style: AppTypography.caption.copyWith(
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
 
