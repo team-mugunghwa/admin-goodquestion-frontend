@@ -30,27 +30,36 @@ class RowGrid extends StatelessWidget {
       children: [
         _FilterBar(columns: page.columns),
         Expanded(
-          child: AppCard(
-            padding: EdgeInsets.zero,
-            child: page.isEmpty
-                ? Padding(
-                    padding: const EdgeInsets.all(AppSpacing.xxl),
-                    child: Center(
-                      child: Text(
-                        vm.keyword.isEmpty
-                            ? '저장된 값이 없습니다.'
-                            : '검색 결과가 없습니다.',
-                        style: AppTypography.caption,
+          // 카드 안에서는 Expanded 가 통하지 않습니다. AppCard 의 Column 이
+          // 자식에게 높이를 무한대로 주기 때문에, 남은 높이를 여기서 재서
+          // 넘겨줍니다.
+          child: LayoutBuilder(
+            builder: (context, constraints) => AppCard(
+              padding: EdgeInsets.zero,
+              child: page.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.all(AppSpacing.xxl),
+                      child: Center(
+                        child: Text(
+                          vm.keyword.isEmpty
+                              ? '저장된 값이 없습니다.'
+                              : '검색 결과가 없습니다.',
+                          style: AppTypography.caption,
+                        ),
+                      ),
+                    )
+                  : SizedBox(
+                      height:
+                          constraints.maxHeight - AppCard.borderWidth * 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(child: _Grid(page: page)),
+                          _Pagination(page: page),
+                        ],
                       ),
                     ),
-                  )
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Expanded(child: _Grid(page: page)),
-                      _Pagination(page: page),
-                    ],
-                  ),
+            ),
           ),
         ),
       ],

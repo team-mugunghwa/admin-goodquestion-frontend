@@ -116,13 +116,21 @@ class AppCard extends StatelessWidget {
   final EdgeInsets padding;
   final Widget child;
 
+  /// 테두리 두께. 상하 [borderWidth] 씩이 카드 높이에 더해집니다.
+  ///
+  /// 남은 높이를 꽉 채우는 카드를 만들 때 필요합니다. 카드 안에서는 `Expanded`
+  /// 가 통하지 않습니다 - 안쪽 `Column` 이 자식에게 높이를 무한대로 주기
+  /// 때문입니다. 그래서 `SizedBox(height: 남은 높이 - borderWidth * 2)` 로
+  /// 직접 높이를 지정합니다.
+  static const double borderWidth = 1;
+
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.ink100),
+        border: Border.all(color: AppColors.ink100, width: borderWidth),
         boxShadow: AppColors.cardShadow,
       ),
       child: Column(
