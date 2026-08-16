@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
@@ -77,6 +79,23 @@ class DioClient {
     parse,
   );
 
+  /// 파일 응답을 그대로 받는다. CSV 내보내기 같은 다운로드가 쓴다.
+  ///
+  /// 실패 응답은 JSON 이므로 [_handleResponse] 가 바이트를 도로 풀어서
+  /// 오류 메시지를 읽는다.
+  Future<Uint8List> getBytes(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+  }) => _request(
+    path,
+    () => _dio.get<List<int>>(
+      path,
+      queryParameters: queryParameters,
+      options: Options(responseType: ResponseType.bytes),
+    ),
+    (data) => Uint8List.fromList((data as List).cast<int>()),
+  );
+
   Future<T> post<T>(
     String path, {
     Object? body,
@@ -129,7 +148,7 @@ class DioClient {
   ) {
     final status = response.statusCode ?? 0;
     final body = response.data;
-    final map = body is Map<String, dynamic> ? body : null;
+    final map = body is Map<String, dynamic> ? body : _decodeErrorBytes(body);
 
     if (status == 401) {
       // 로그인 자체가 401 이면 "로그인 실패"이지 "로그아웃되었다"가 아닙니다.
@@ -152,6 +171,17 @@ class DioClient {
       );
     }
     return parse(body);
+  }
+
+  /// 바이트로 받은 요청의 실패 본문. 서버 오류는 JSON 이라 도로 풀어야 메시지가 보인다.
+  Map<String, dynamic>? _decodeErrorBytes(Object? body) {
+    if (body is! List<int>) return null;
+    try {
+      final decoded = jsonDecode(utf8.decode(body));
+      return decoded is Map<String, dynamic> ? decoded : null;
+    } on FormatException {
+      return null;
+    }
   }
 
   AppException _mapDioException(DioException e) => switch (e.type) {

@@ -32,6 +32,8 @@ abstract final class AppIcons {
   static const IconData more = Icons.more_horiz_rounded;
   static const IconData dragHandle = Icons.drag_indicator_rounded;
   static const IconData logout = Icons.logout_rounded;
+  static const IconData download = Icons.download_rounded;
+  static const IconData period = Icons.date_range_rounded;
 
   // 페이지네이션
   static const IconData previousPage = Icons.chevron_left_rounded;
