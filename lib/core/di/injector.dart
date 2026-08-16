@@ -13,6 +13,9 @@ import '../../features/auth/presentation/viewmodels/admin_session.dart';
 import '../../features/dashboard/data/dashboard_repository_impl.dart';
 import '../../features/dashboard/domain/repositories/dashboard_repository.dart';
 import '../../features/dashboard/domain/usecases/get_dashboard_summary_use_case.dart';
+import '../../features/database/data/database_repository_impl.dart';
+import '../../features/database/domain/repositories/database_repository.dart';
+import '../../features/database/domain/usecases/database_use_cases.dart';
 import '../../features/guide/data/guide_repository_impl.dart';
 import '../../features/guide/domain/repositories/guide_repository.dart';
 import '../../features/guide/domain/usecases/guide_use_cases.dart';
@@ -173,6 +176,14 @@ void _registerOperations() {
     )
     ..registerLazySingleton<AuditLogRepository>(
       () => AuditLogRepositoryImpl(getIt<DioClient>()),
+    )
+    ..registerLazySingleton<DatabaseRepository>(
+      () => DatabaseRepositoryImpl(getIt<DioClient>()),
+    )
+    ..registerLazySingleton(() => GetTablesUseCase(getIt<DatabaseRepository>()))
+    ..registerLazySingleton(() => GetTableUseCase(getIt<DatabaseRepository>()))
+    ..registerLazySingleton(
+      () => GetTableRowsUseCase(getIt<DatabaseRepository>()),
     );
 }
 

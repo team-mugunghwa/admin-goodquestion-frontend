@@ -39,6 +39,10 @@ abstract final class AppRoutes {
   /// 감사 로그.
   static const String auditLogs = '/audit-logs';
 
+  /// 데이터베이스 둘러보기. 읽기 전용이라 하위 경로에 편집 화면이 없습니다.
+  static const String database = '/database';
+  static const String dbTablePath = '/database/:tableName';
+
   /// 내 계정(비밀번호 변경).
   static const String account = '/account';
 
@@ -47,11 +51,13 @@ abstract final class AppRoutes {
   static const String parentIdParam = 'parentId';
   static const String noticeIdParam = 'noticeId';
   static const String inquiryIdParam = 'inquiryId';
+  static const String tableNameParam = 'tableName';
 
   static String storyDetailOf(String storyId) => '/stories/$storyId';
   static String memberDetailOf(String parentId) => '/members/$parentId';
   static String noticeDetailOf(String noticeId) => '/notices/$noticeId';
   static String inquiryDetailOf(String inquiryId) => '/inquiries/$inquiryId';
+  static String dbTableOf(String tableName) => '/database/$tableName';
 
   /// 로그인 후 돌아갈 곳을 실어 보내는 쿼리 파라미터 이름.
   ///
