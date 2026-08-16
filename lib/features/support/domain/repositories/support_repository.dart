@@ -32,4 +32,23 @@ abstract class SupportRepository {
   Future<void> close(String inquiryId);
 
   Future<void> reopen(String inquiryId);
+
+  /// 문의를 나에게 배정합니다. 이미 잡힌 문의를 넘겨받는 것도 이 호출입니다.
+  Future<void> assignToMe(String inquiryId);
+
+  Future<void> unassign(String inquiryId);
+
+  /// 내부 메모를 남깁니다. 수정과 삭제가 없습니다.
+  Future<InquiryNote> addNote({required String inquiryId, required String body});
+
+  Future<List<ReplyTemplate>> getTemplates();
+
+  /// [id] 가 null 이면 생성, 있으면 수정입니다.
+  Future<ReplyTemplate> saveTemplate({
+    String? id,
+    required String title,
+    required String body,
+  });
+
+  Future<void> deleteTemplate(String id);
 }
