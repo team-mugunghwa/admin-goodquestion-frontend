@@ -76,6 +76,7 @@ DioClient 가 그 함수를 직접 참조합니다.
 | `/inquiries`, `/inquiries/:inquiryId` | 고객센터 |
 | `/guides` | 이용안내 |
 | `/database`, `/database/:tableName` | 데이터베이스 둘러보기. 읽기 전용 |
+| `/database/diagram` | 테이블 관계도 |
 | `/admins` | 관리자 계정 (최고관리자) |
 | `/audit-logs` | 감사 로그 |
 | `/account` | 비밀번호 변경 |
