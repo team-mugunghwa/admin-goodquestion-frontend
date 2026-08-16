@@ -70,6 +70,7 @@ const List<_NavItem> _navItems = [
   _NavItem(AppRoutes.notices, AppIcons.notice, '공지사항 관리'),
   _NavItem(AppRoutes.inquiries, AppIcons.inquiry, '고객센터'),
   _NavItem(AppRoutes.guides, AppIcons.guide, '이용안내 관리'),
+  _NavItem(AppRoutes.database, AppIcons.database, '데이터베이스'),
   _NavItem(AppRoutes.admins, AppIcons.admin, '관리자 계정', superAdminOnly: true),
   _NavItem(AppRoutes.auditLogs, AppIcons.auditLog, '감사 로그'),
 ];
