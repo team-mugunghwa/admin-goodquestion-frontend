@@ -86,6 +86,9 @@ class MemberRepositoryImpl implements MemberRepository {
     status: MemberStatus.fromCode(json['status'] as String?),
     locked: json['locked'] as bool? ?? false,
     childCount: (json['childCount'] as num?)?.toInt() ?? 0,
+    lastLoginAt: DateTime.tryParse(
+      json['lastLoginAt'] as String? ?? '',
+    )?.toLocal(),
     createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '')?.toLocal(),
   );
 
@@ -99,6 +102,9 @@ class MemberRepositoryImpl implements MemberRepository {
     lockedUntil: DateTime.tryParse(json['lockedUntil'] as String? ?? '')?.toLocal(),
     suspendedReason: json['suspendedReason'] as String?,
     suspendedAt: DateTime.tryParse(json['suspendedAt'] as String? ?? '')?.toLocal(),
+    lastLoginAt: DateTime.tryParse(
+      json['lastLoginAt'] as String? ?? '',
+    )?.toLocal(),
     lastLoginIp: json['lastLoginIp'] as String?,
     createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '')?.toLocal(),
     children: (json['children'] as List? ?? [])
