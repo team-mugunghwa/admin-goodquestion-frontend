@@ -1,6 +1,7 @@
 import '../../../core/error/exceptions.dart';
 import '../../../core/error/failure.dart';
 import '../../../core/network/dio_client.dart';
+import '../../support/domain/entities/inquiry.dart';
 import '../domain/entities/dashboard_summary.dart';
 import '../domain/repositories/dashboard_repository.dart';
 
@@ -49,6 +50,19 @@ class DashboardRepositoryImpl implements DashboardRepository {
             (point) => DailyPoint(
               date: DateTime.parse(point['date'] as String),
               value: _int(point['value']),
+            ),
+          )
+          .toList(),
+      waitingInquiries: (json['waitingInquiries'] as List? ?? [])
+          .whereType<Map<String, dynamic>>()
+          .map(
+            (inquiry) => WaitingInquiry(
+              id: inquiry['id'] as String,
+              title: inquiry['title'] as String? ?? '',
+              category: InquiryCategory.fromCode(inquiry['category'] as String?),
+              createdAt: DateTime.tryParse(
+                inquiry['createdAt'] as String? ?? '',
+              )?.toLocal(),
             ),
           )
           .toList(),

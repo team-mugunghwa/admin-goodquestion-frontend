@@ -136,6 +136,14 @@ class _Content extends StatelessWidget {
               title: '최근 2주 방문자',
               child: VisitTrendChart(points: summary.visitTrend),
             );
+            final waiting = AppCard(
+              title: '답변을 기다리는 문의',
+              trailing: TextButton(
+                onPressed: () => context.go(AppRoutes.inquiries),
+                child: const Text('전체 보기'),
+              ),
+              child: _WaitingInquiries(items: summary.waitingInquiries),
+            );
             final activities = AppCard(
               title: '최근 관리자 활동',
               child: _RecentActivities(items: summary.recentActivities),
@@ -146,14 +154,28 @@ class _Content extends StatelessWidget {
                 children: [
                   trend,
                   const SizedBox(height: AppSpacing.lg),
+                  waiting,
+                  const SizedBox(height: AppSpacing.lg),
                   activities,
                 ],
               );
             }
+            // 넓은 화면에서는 왼쪽 열이 그래프 하나뿐이라 활동 목록(최대 10줄)보다
+            // 훨씬 짧아 아래가 비었습니다. 그 자리에 문의를 넣어 높이도 맞춥니다.
             return Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(flex: 3, child: trend),
+                Expanded(
+                  flex: 3,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      trend,
+                      const SizedBox(height: AppSpacing.lg),
+                      waiting,
+                    ],
+                  ),
+                ),
                 const SizedBox(width: AppSpacing.lg),
                 Expanded(flex: 2, child: activities),
               ],
@@ -187,6 +209,67 @@ class _CardGrid extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+/// 답변을 기다리는 문의. 오래 기다린 순서라 맨 위가 가장 급합니다.
+///
+/// 대기 시간을 상대 시간으로 적습니다. 표가 아니라 목록이라 줄 사이의 선후를 가릴
+/// 필요가 없고, "사흘 전"이 "2026-08-14 09:12"보다 급한 정도를 바로 보여줍니다.
+class _WaitingInquiries extends StatelessWidget {
+  const _WaitingInquiries({required this.items});
+
+  final List<WaitingInquiry> items;
+
+  @override
+  Widget build(BuildContext context) {
+    if (items.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
+        child: Text('기다리는 문의가 없습니다', style: AppTypography.caption),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final inquiry in items)
+          InkWell(
+            onTap: () => context.go(AppRoutes.inquiryDetailOf(inquiry.id)),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          inquiry.title,
+                          style: AppTypography.body,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          inquiry.category.label,
+                          style: AppTypography.caption,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Text(
+                    Formats.relative(inquiry.createdAt),
+                    style: AppTypography.caption,
+                  ),
+                ],
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
