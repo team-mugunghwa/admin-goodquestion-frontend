@@ -201,6 +201,12 @@ class _ProfileCard extends StatelessWidget {
             },
           ),
           _Field(label: '가입일', value: Formats.date(member.createdAt)),
+          // 시각과 위치를 나란히 둡니다. 다만 IP는 재발급으로 갱신되지 않아
+          // 둘의 시점이 어긋날 수 있습니다.
+          _Field(
+            label: '마지막 접속',
+            value: Formats.dateTime(member.lastLoginAt),
+          ),
           _Field(label: '마지막 접속 IP', value: member.lastLoginIp ?? '-'),
           _Field(
             label: '로그인 잠금',

@@ -154,6 +154,16 @@ class _MemberListBody extends StatelessWidget {
                           style: AppTypography.caption,
                         ),
                       ),
+                      // 상대 시간이 아니라 절대 시각으로 적습니다. 목록에서 "3일 전"이
+                      // 섞이면 위아래 줄의 선후를 눈으로 못 가립니다.
+                      AppColumn(
+                        label: '마지막 접속',
+                        width: 150,
+                        cellBuilder: (context, member) => Text(
+                          Formats.dateTime(member.lastLoginAt),
+                          style: AppTypography.caption,
+                        ),
+                      ),
                     ],
                   ),
                 ),

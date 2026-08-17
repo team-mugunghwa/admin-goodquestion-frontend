@@ -29,6 +29,7 @@ class MemberSummary {
     required this.locked,
     required this.childCount,
     this.email,
+    this.lastLoginAt,
     this.createdAt,
   });
 
@@ -43,6 +44,9 @@ class MemberSummary {
   /// 로그인 실패로 잠긴 상태. 정지와는 다른 사유입니다.
   final bool locked;
   final int childCount;
+
+  /// 마지막 접속 시각. 접속 기록이 없으면 null입니다.
+  final DateTime? lastLoginAt;
   final DateTime? createdAt;
 }
 
@@ -130,6 +134,7 @@ class MemberDetail {
     this.lockedUntil,
     this.suspendedReason,
     this.suspendedAt,
+    this.lastLoginAt,
     this.lastLoginIp,
     this.createdAt,
   });
@@ -143,6 +148,11 @@ class MemberDetail {
   final DateTime? lockedUntil;
   final String? suspendedReason;
   final DateTime? suspendedAt;
+
+  /// 마지막 접속 시각. 로그인과 토큰 재발급이 모두 갱신합니다.
+  final DateTime? lastLoginAt;
+
+  /// 마지막 로그인 위치. 재발급으로는 갱신되지 않아 [lastLoginAt]과 시점이 다를 수 있습니다.
   final String? lastLoginIp;
   final DateTime? createdAt;
   final List<ChildProfile> children;
