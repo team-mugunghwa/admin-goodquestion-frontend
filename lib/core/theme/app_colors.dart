@@ -31,6 +31,14 @@ abstract final class AppColors {
   static const Color warning = Color(0xFF9A6412);
   static const Color warningSurface = Color(0xFFFBF0DC);
 
+  /// 경고 배경([warningSurface]) 위에 얹는 **본문** 색.
+  ///
+  /// [warning] 을 그대로 본문에 쓰면 그 배경 위에서 대비가 4.42:1 이라
+  /// 기준(4.5:1)에 못 미칩니다. 아이콘과 테두리는 [warning] 을 쓰되,
+  /// **읽으라고 띄운 글**은 이 색을 씁니다(8.44:1). 경고라는 사실은 배경과
+  /// 아이콘이 이미 말하고 있어서 글자까지 주황일 이유가 없습니다.
+  static const Color warningInk = ink700;
+
   /// 되돌릴 수 없는 것. 삭제, 정지.
   static const Color danger = Color(0xFFB3403C);
   static const Color dangerSurface = Color(0xFFFAEAEA);

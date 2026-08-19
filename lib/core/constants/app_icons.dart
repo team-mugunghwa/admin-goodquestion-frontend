@@ -20,6 +20,12 @@ abstract final class AppIcons {
   static const IconData database = Icons.storage_rounded;
   static const IconData diagram = Icons.account_tree_rounded;
 
+  /// 설정. 톱니(`settings_rounded`) 대신 슬라이더를 씁니다 - 메뉴의 `관리자 계정`이
+  /// `admin_panel_settings_rounded`(방패 안의 톱니)라 실루엣이 겹칩니다.
+  /// 두 칸 떨어져 있고 그쪽은 최고관리자에게만 보이지만, 겹치지 않는 쪽이
+  /// 고를 이유가 없을 때 굳이 겹치는 쪽을 고를 이유도 없습니다.
+  static const IconData settings = Icons.tune_rounded;
+
   // 조작
   static const IconData add = Icons.add_rounded;
   static const IconData edit = Icons.edit_rounded;

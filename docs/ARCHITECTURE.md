@@ -79,6 +79,7 @@ DioClient 가 그 함수를 직접 참조합니다.
 | `/database/diagram` | 테이블 관계도 |
 | `/admins` | 관리자 계정 (최고관리자) |
 | `/audit-logs` | 감사 로그 |
+| `/settings` | 운영 설정. 지금은 음성 합성 엔진 전환 한 항목 |
 | `/account` | 비밀번호 변경 |
 
 **로그인 여부 판단은 `app_router.dart` 의 `redirect` 한 곳에만 둡니다.**

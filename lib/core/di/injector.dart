@@ -25,6 +25,9 @@ import '../../features/member/domain/usecases/member_use_cases.dart';
 import '../../features/notice/data/notice_repository_impl.dart';
 import '../../features/notice/domain/repositories/notice_repository.dart';
 import '../../features/notice/domain/usecases/notice_use_cases.dart';
+import '../../features/settings/data/tts_vendor_repository_impl.dart';
+import '../../features/settings/domain/repositories/tts_vendor_repository.dart';
+import '../../features/settings/domain/usecases/tts_vendor_use_cases.dart';
 import '../../features/story/data/story_repository_impl.dart';
 import '../../features/story/domain/repositories/story_repository.dart';
 import '../../features/story/domain/usecases/story_use_cases.dart';
@@ -60,6 +63,7 @@ Future<void> configureDependencies() async {
   _registerDashboard();
   _registerContent();
   _registerOperations();
+  _registerSettings();
 }
 
 void _registerAuth() {
@@ -75,8 +79,12 @@ void _registerAuth() {
     )
     ..registerLazySingleton(() => LoginUseCase(getIt<AuthRepository>()))
     ..registerLazySingleton(() => LogoutUseCase(getIt<AuthRepository>()))
-    ..registerLazySingleton(() => RestoreSessionUseCase(getIt<AuthRepository>()))
-    ..registerLazySingleton(() => ChangePasswordUseCase(getIt<AuthRepository>()))
+    ..registerLazySingleton(
+      () => RestoreSessionUseCase(getIt<AuthRepository>()),
+    )
+    ..registerLazySingleton(
+      () => ChangePasswordUseCase(getIt<AuthRepository>()),
+    )
     ..registerLazySingleton(() => GetAdminsUseCase(getIt<AuthRepository>()))
     ..registerLazySingleton(() => CreateAdminUseCase(getIt<AuthRepository>()))
     ..registerLazySingleton(() => UpdateAdminUseCase(getIt<AuthRepository>()))
@@ -109,13 +117,21 @@ void _registerContent() {
     )
     ..registerLazySingleton(() => GetNoticesUseCase(getIt<NoticeRepository>()))
     ..registerLazySingleton(() => GetNoticeUseCase(getIt<NoticeRepository>()))
-    ..registerLazySingleton(() => CreateNoticeUseCase(getIt<NoticeRepository>()))
-    ..registerLazySingleton(() => UpdateNoticeUseCase(getIt<NoticeRepository>()))
-    ..registerLazySingleton(() => DeleteNoticeUseCase(getIt<NoticeRepository>()))
+    ..registerLazySingleton(
+      () => CreateNoticeUseCase(getIt<NoticeRepository>()),
+    )
+    ..registerLazySingleton(
+      () => UpdateNoticeUseCase(getIt<NoticeRepository>()),
+    )
+    ..registerLazySingleton(
+      () => DeleteNoticeUseCase(getIt<NoticeRepository>()),
+    )
     ..registerLazySingleton(
       () => GetNoticeRevisionsUseCase(getIt<NoticeRepository>()),
     )
-    ..registerLazySingleton(() => RevertNoticeUseCase(getIt<NoticeRepository>()))
+    ..registerLazySingleton(
+      () => RevertNoticeUseCase(getIt<NoticeRepository>()),
+    )
     ..registerLazySingleton(
       () => ScheduleNoticeUseCase(getIt<NoticeRepository>()),
     )
@@ -128,7 +144,9 @@ void _registerContent() {
     ..registerLazySingleton(() => GetGuidesUseCase(getIt<GuideRepository>()))
     ..registerLazySingleton(() => CreateGuideUseCase(getIt<GuideRepository>()))
     ..registerLazySingleton(() => UpdateGuideUseCase(getIt<GuideRepository>()))
-    ..registerLazySingleton(() => ReorderGuidesUseCase(getIt<GuideRepository>()))
+    ..registerLazySingleton(
+      () => ReorderGuidesUseCase(getIt<GuideRepository>()),
+    )
     ..registerLazySingleton(() => DeleteGuideUseCase(getIt<GuideRepository>()))
     ..registerLazySingleton<StoryRepository>(
       () => StoryRepositoryImpl(getIt<DioClient>()),
@@ -139,10 +157,16 @@ void _registerContent() {
     ..registerLazySingleton(() => DeleteStoryUseCase(getIt<StoryRepository>()))
     ..registerLazySingleton(() => GetScenesUseCase(getIt<StoryRepository>()))
     ..registerLazySingleton(() => SaveSceneUseCase(getIt<StoryRepository>()))
-    ..registerLazySingleton(() => ReorderScenesUseCase(getIt<StoryRepository>()))
+    ..registerLazySingleton(
+      () => ReorderScenesUseCase(getIt<StoryRepository>()),
+    )
     ..registerLazySingleton(() => DeleteSceneUseCase(getIt<StoryRepository>()))
-    ..registerLazySingleton(() => GetCharactersUseCase(getIt<StoryRepository>()))
-    ..registerLazySingleton(() => SaveCharacterUseCase(getIt<StoryRepository>()))
+    ..registerLazySingleton(
+      () => GetCharactersUseCase(getIt<StoryRepository>()),
+    )
+    ..registerLazySingleton(
+      () => SaveCharacterUseCase(getIt<StoryRepository>()),
+    )
     ..registerLazySingleton(
       () => DeleteCharacterUseCase(getIt<StoryRepository>()),
     )
@@ -179,12 +203,18 @@ void _registerOperations() {
     ..registerLazySingleton(
       () => AnswerInquiryUseCase(getIt<SupportRepository>()),
     )
-    ..registerLazySingleton(() => UpdateAnswerUseCase(getIt<SupportRepository>()))
-    ..registerLazySingleton(() => CloseInquiryUseCase(getIt<SupportRepository>()))
+    ..registerLazySingleton(
+      () => UpdateAnswerUseCase(getIt<SupportRepository>()),
+    )
+    ..registerLazySingleton(
+      () => CloseInquiryUseCase(getIt<SupportRepository>()),
+    )
     ..registerLazySingleton(
       () => ReopenInquiryUseCase(getIt<SupportRepository>()),
     )
-    ..registerLazySingleton(() => AssignInquiryUseCase(getIt<SupportRepository>()))
+    ..registerLazySingleton(
+      () => AssignInquiryUseCase(getIt<SupportRepository>()),
+    )
     ..registerLazySingleton(
       () => UnassignInquiryUseCase(getIt<SupportRepository>()),
     )
@@ -213,6 +243,23 @@ void _registerOperations() {
     ..registerLazySingleton(() => GetTableUseCase(getIt<DatabaseRepository>()))
     ..registerLazySingleton(
       () => GetTableRowsUseCase(getIt<DatabaseRepository>()),
+    );
+}
+
+/// 서비스 동작 설정 - 콘텐츠도 사용자 관리도 아닌, 서버가 무엇으로 도는지를 정하는 값.
+///
+/// 운영 업무와 묶지 않고 따로 둡니다. 앞으로 설정 항목이 늘어날 자리라
+/// [_registerOperations] 안에 섞이면 무엇이 설정이고 무엇이 업무인지 흐려집니다.
+void _registerSettings() {
+  getIt
+    ..registerLazySingleton<TtsVendorRepository>(
+      () => TtsVendorRepositoryImpl(getIt<DioClient>()),
+    )
+    ..registerLazySingleton(
+      () => GetTtsVendorUseCase(getIt<TtsVendorRepository>()),
+    )
+    ..registerLazySingleton(
+      () => UpdateTtsVendorUseCase(getIt<TtsVendorRepository>()),
     );
 }
 
