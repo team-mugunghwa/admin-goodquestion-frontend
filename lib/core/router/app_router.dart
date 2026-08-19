@@ -16,6 +16,7 @@ import '../../features/member/presentation/views/member_detail_view.dart';
 import '../../features/member/presentation/views/member_list_view.dart';
 import '../../features/notice/presentation/views/notice_edit_view.dart';
 import '../../features/notice/presentation/views/notice_list_view.dart';
+import '../../features/settings/presentation/views/settings_view.dart';
 import '../../features/story/presentation/views/story_edit_view.dart';
 import '../../features/story/presentation/views/story_list_view.dart';
 import '../../features/support/presentation/views/inquiry_detail_view.dart';
@@ -158,13 +159,18 @@ GoRouter createRouter(AdminSession session) {
             ],
           ),
           GoRoute(
+            path: AppRoutes.settings,
+            builder: (context, state) => const SettingsView(),
+          ),
+          GoRoute(
             path: AppRoutes.account,
             builder: (context, state) => const MyAccountView(),
           ),
         ],
       ),
     ],
-    errorBuilder: (context, state) => _RouteNotFoundView(location: state.uri.path),
+    errorBuilder: (context, state) =>
+        _RouteNotFoundView(location: state.uri.path),
   );
 }
 

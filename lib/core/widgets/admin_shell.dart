@@ -52,7 +52,12 @@ class AdminShell extends StatelessWidget {
 }
 
 class _NavItem {
-  const _NavItem(this.route, this.icon, this.label, {this.superAdminOnly = false});
+  const _NavItem(
+    this.route,
+    this.icon,
+    this.label, {
+    this.superAdminOnly = false,
+  });
 
   final String route;
   final IconData icon;
@@ -73,6 +78,9 @@ const List<_NavItem> _navItems = [
   _NavItem(AppRoutes.database, AppIcons.database, '데이터베이스'),
   _NavItem(AppRoutes.admins, AppIcons.admin, '관리자 계정', superAdminOnly: true),
   _NavItem(AppRoutes.auditLogs, AppIcons.auditLog, '감사 로그'),
+  // 서버에 역할 제한이 없어 superAdminOnly 를 붙이지 않습니다. 모든 관리자가
+  // 실제로 바꿀 수 있는데 메뉴만 감추면, 되는 일을 못 하는 것으로 오해합니다.
+  _NavItem(AppRoutes.settings, AppIcons.settings, '설정'),
 ];
 
 class _SideNav extends StatelessWidget {
@@ -85,7 +93,9 @@ class _SideNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final role = context.watch<AdminSession>().admin?.role;
     final items = _navItems
-        .where((item) => !item.superAdminOnly || (role?.canManageAdmins ?? false))
+        .where(
+          (item) => !item.superAdminOnly || (role?.canManageAdmins ?? false),
+        )
         .toList();
 
     return Container(
